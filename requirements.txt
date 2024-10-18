@@ -89,7 +89,7 @@ webdriver-manager==4.0.2
 webencodings==0.5.1
 Werkzeug==3.0.4
 wheel==0.44.0
-whitenoise-6.7.0
+whitenoise==6.5.0
 wrapt==1.16.0
 wsproto==1.2.0
 xhtml2pdf==0.2.16
