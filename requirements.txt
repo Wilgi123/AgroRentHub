@@ -25,6 +25,7 @@ git-filter-repo==2.45.0
 google-auth==2.31.0
 google-auth-oauthlib==1.2.0
 google-pasta==0.2.0
+gunicorn
 grpcio==1.66.1
 h11==0.14.0
 h5py==3.11.0
