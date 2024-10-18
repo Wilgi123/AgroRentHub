@@ -1,0 +1,206 @@
+/* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f9f9f9;
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* Ensure the body takes at least the full height of the viewport */
+}
+
+header {
+    background: linear-gradient(135deg,#039101, #06337b);
+    color: white;
+    padding: 10px 20px; /* Compact header */
+    position: fixed;
+    width: calc(100% - 30px); 
+    z-index: 2; /* Ensure the header is above the sidebar */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+header  {
+    font-size: 20px;
+    font-weight: 600;
+    color: #fff;
+}
+.logo {
+    font-family: 'Poppins', sans-serif;
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    color: #ffffff;
+    text-shadow: 2px 2px 4px rgb(255, 255, 255);
+    margin: 0;
+    text-align: center;
+}
+
+header nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    align-items: center;
+}
+
+header nav ul a {
+    background-color: white;
+    color: #4CAF50;
+    padding: 8px 16px;
+    text-decoration: none;
+    border-radius: 4px;
+    margin-left: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+header nav ul a:hover {
+    background-color: #f1f1f1;
+    color: #388E3C;
+}
+
+.container {
+    display: flex;
+    flex-direction: row;
+    margin-top: 60px; /* Height of header */
+    margin-bottom: 40px; /* Height of footer */
+}
+
+.sidebar {
+    width: 200px;
+    background: linear-gradient(135deg,#039101, #06337b);
+    padding-top: 5px;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    position: fixed;
+    top: 50px; /* Height of header */
+    bottom: 37px; /* Height of footer */
+    overflow-y: auto;
+    z-index: 1; /* Ensure the sidebar is below the header and footer */
+}
+
+.sidebar nav ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar nav ul li {
+    margin: 15px 0;
+}
+
+.sidebar nav ul li a {
+    color: white;
+    text-decoration: none;
+    padding: 10px 20px;
+    display: block;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+.sidebar nav ul li a:hover {
+    background: linear-gradient(135deg,#038336,#14e4c9);
+}
+
+.main {
+    margin-left: 220px; /* Width of sidebar + some margin */
+    padding: 20px;
+    flex-grow: 1; /* Allow main content to grow and fill available space */
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+}
+
+.main h2 {
+    margin-top: 0;
+    font-size: 24px;
+    font-weight: 600;
+    color: #333;
+}
+
+.content {
+    background-color: #fff;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+}
+
+.content h3 {
+    margin-top: 0;
+    font-size: 20px;
+    font-weight: 600;
+    color: #333;
+}
+/* Table container */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+/* Header styling */
+table thead {
+    background: linear-gradient(135deg, #2d126c,#14e4c9);
+    color: white;
+    text-align: center;
+}
+
+/* Header cells styling */
+table th {
+    padding: 12px 15px;
+    font-weight: bold;
+}
+
+/* Body cells styling */
+table td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #ddd;
+    text-align: center;
+}
+
+/* Zebra striping for rows */
+table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+/* First column styling */
+table td:first-child {
+    font-weight: bold;
+    color: #333;
+}
+
+/* Price column styling */
+table td:last-child {
+    color: #100566;
+    font-weight: bold;
+}
+
+/* Responsive design: table wrapping */
+@media (max-width: 768px) {
+    table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+}
+
+.footer {
+    background: linear-gradient(135deg, #06337b,#039101);
+    color: white;
+    text-align: center;
+    padding: 10px 0;
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+}
+
+.footer p {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 400;
+}
