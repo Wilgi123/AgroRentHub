@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Customer Dashboard</title>
+        {% load static %}
+        <link rel="stylesheet" href="{% static 'css/customer/style.css' %}">
+        <script src="{% static 'js/customer/script.js' %}" defer></script>
+        <style>
+        .welcome-container {
+            position: relative;
+            width: 100%;
+            height: 200px;
+            overflow: hidden;
+        }
+
+        .welcome-message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: white;
+            z-index: 1;
+            width: 80%;
+            max-width: 600px;
+        }
+
+        .welcome-message h1,
+        .welcome-message p {
+            font-family: 'Great Vibes', cursive;
+        }
+
+        .welcome-message h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            animation: textAnimation 2s ease-in-out;
+        }
+
+        .welcome-message p {
+            font-size: 1.2rem;
+            animation: textAnimation 3s ease-in-out;
+        }
+
+        .welcome-container::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4));
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .welcome-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 0;
+        }
+
+        body {
+            font-family: "Lato", sans-serif;
+            margin: 0;
+        }
+
+        .container {
+            display: flex;
+        }
+
+        .sidenav {
+            width: 200px;
+            background: #022100;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .sidenav a {
+            padding: 10px 15px;
+            text-decoration: none;
+            font-size: 18px;
+            color: white;
+            display: block;
+            cursor: pointer;
+            margin-bottom: 5px;
+            border-radius: 5px;
+        }
+
+        .sidenav a:hover {
+            background-color: #19b531;
+            color: white;
+        }
+
+        .main {
+            flex-grow: 1;
+            padding: 20px;
+        }
+
+        .content-box {
+            border: 1px solid #ccc;
+            padding: 20px;
+            margin-top: 10px;
+            background: #f9f9f9;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            width: 650px;
+            margin: auto;
+        }
+
+        form label {
+            margin-top: 5px;
+        }
+
+        form input {
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        form button {
+            padding: 10px;
+            background-color: #022100;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+            font-size: 16px;
+        }
+
+        form button:hover {
+            background-color: #19b531;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        table th,
+        table td {
+            padding: 12px;
+            border: 1px solid #ccc;
+            text-align: left;
+        }
+
+        table th {
+            background-color: #f2f2f2;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .error {
+            color: red;
+            font-size: 16px;
+            margin-top: -10px;
+            margin-bottom: 10px;
+            font-weight: 800;
+        }
+    </style>
+    </head>
+
+    <body>
+        {% if request.session.user_id %}
+        <header>
+            <div class="logo">AgroRent</div>
+            <nav>
+                <ul>
+                    <li><a href="{% url 'customer_index' %}">Home</a></li>
+                    <li><a href="{% url 'customer_service' %}">Services</a></li>
+                    <li><a href="{% url 'products' %}">Products</a></li>
+                    <li><a href="{% url 'productcart' %}">Cart</a></li>
+                    <li><a href="{% url 'orderdetails' %}">Orders</a></li>
+                    <li><a href="{% url 'customer_profile' %}">Profile</a></li>
+                    <li><a href="{% url 'logout' %}">Logout</a></li>
+                </ul>
+            </nav>
+        </header>
+        <main>
+            <section class="content">
+                <div class="welcome-container">
+                    <img class="welcome-image"
+                        src="{% static 'images/welcome.jpg' %}"
+                        alt="Welcome Image">
+                    <div class="welcome-message">
+                        <h1>Customer Dashboard</h1>
+                    </div>
+                </div>
+
+                <div class="container">
+                    <div class="sidenav">
+                        <a href="#" data-content="display-details">Display
+                            Details</a>
+                        <a href="#" data-content="edit-details">Edit Details</a>
+                        <a href="#" data-content="change-password">Change
+                            Password</a>
+                        <!--<a href="#" data-content="show-rented-product">Show
+                            Rented Product</a>-->
+                    </div>
+
+                    <div class="main">
+                        <div id="display-details" class="content-box">
+                            <h2>User Details</h2>
+                            <p>Name: {{ user.name }}</p>
+                            <p>Email: {{ user.email }}</p>
+                            <p>Phone: {{ user.phone }}</p>
+                            <p>Address: {{ user.address }}</p>
+                        </div>
+                        <div id="edit-details" class="content-box hidden">
+                            <h2>Edit Details</h2>
+                            <form method="post"
+                                action="{% url 'edit_details' %}"
+                                id="editDetailsForm">
+                                {% csrf_token %}
+                                <label for="name">Name:</label>
+                                <input type="text" id="name" name="name"
+                                    value="{{ user.name }}"><br>
+                                <p id="nameError" class="error"></p>
+
+                                <!---<label for="email">Email:</label>
+                                <input type="email" id="email" name="email"
+                                    value="{{ user.email }}"><br>
+                                <p id="emailError" class="error"></p>--->
+
+                                <label for="phone">Phone:</label>
+                                <input type="text" id="phone" name="phone"
+                                    value="{{ user.phone }}"><br>
+                                <p id="phoneError" class="error"></p>
+
+                                <label for="address">Address:</label>
+                                <input type="text" id="address" name="address"
+                                    value="{{ user.address }}"><br>
+                                <p id="addressError" class="error"></p>
+
+                                <button type="submit">Update Details</button>
+                            </form>
+                        </div>
+                        <div id="change-password" class="content-box hidden">
+                            <h2>Change Password</h2>
+                            <form method="post" action="{% url 'change_password' %}" id="changePasswordForm">
+                                {% csrf_token %}
+                                <label for="current-password">Current Password:</label>
+                                <input type="password" id="current-password" name="current-password"><br>
+                                <p id="currentPasswordError" class="error"></p>
+                        
+                                <label for="new-password">New Password:</label>
+                                <input type="password" id="password" name="new-password"><br>
+                                <p id="passwordError" class="error"></p>
+                        
+                                <label for="confirm-password">Confirm Password:</label>
+                                <input type="password" id="confirmPassword" name="confirm-password"><br>
+                                <p id="confirmPasswordError" class="error"></p><br>
+                        
+                                <button type="submit">Update Password</button>
+                            </form>
+                        </div>
+                        
+                        <!--<div id="show-rented-product"
+                            class="content-box hidden">
+                            <h2>Show Rented Product</h2>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Si No</th>
+                                        <th>Product Name</th>
+                                        <th>Rs</th>
+                                        <th>Date of Rented</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>1</td>
+                                        <td>Tractor</td>
+                                        <td>5000</td>
+                                        <td>2024-06-15</td>
+                                    </tr>
+                                    <tr>
+                                        <td>2</td>
+                                        <td>Harvester</td>
+                                        <td>7000</td>
+                                        <td>2024-06-18</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>--->
+                    </div>
+                </div>
+            </section>
+           
+        </main>
+        <footer class="footer">
+            <p>&copy; 2024 Agriculture Rental Hub. All rights reserved.</p>
+        </footer>
+        {% else %}
+        <h2>You are not logged in</h2>
+        {% endif %}
+    </body>
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const links = document.querySelectorAll(".sidenav a");
+        const contentBoxes = document.querySelectorAll(".main .content-box");
+
+        links.forEach(link => {
+            link.addEventListener("click", function (event) {
+                event.preventDefault();
+                const contentId = this.getAttribute("data-content");
+
+                contentBoxes.forEach(box => {
+                    if (box.id === contentId) {
+                        box.classList.remove("hidden");
+                    } else {
+                        box.classList.add("hidden");
+                    }
+                });
+            });
+        });
+
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const nameField = document.getElementById('name');
+        /*const emailField = document.getElementById('email');*/
+        const addressField = document.getElementById('address');
+        const phoneField = document.getElementById('phone');
+        const passwordField = document.getElementById('password');
+        const confirmPasswordField = document.getElementById('confirmPassword');
+        const currentPasswordField = document.getElementById('current-password');
+        const currentPasswordError = document.getElementById('currentPasswordError');
+        const nameError = document.getElementById('nameError');
+       /* const emailError = document.getElementById('emailError');*/
+        const addressError = document.getElementById('addressError');
+        const phoneError = document.getElementById('phoneError');
+        const passwordError = document.getElementById('passwordError');
+        const confirmPasswordError = document.getElementById('confirmPasswordError');
+
+        const namePattern = /^[A-Z][a-zA-Z\s.]*$/;
+        /*const emailPattern = /^[a-zA-Z0-9._%+-]+@(gmail\.com|yahoo\.com|mca\.ajce\.in)$/;*/
+        const phonePattern = /^[6-9][0-9]{9,13}$/;
+        const addressPattern = /^[a-zA-Z0-9.,\s]+$/;
+        const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
+        function validateName() {
+            const nameValue = nameField.value.trim();
+            if (!namePattern.test(nameValue) || /\s{2,}/.test(nameValue) || /^\s/.test(nameValue)) {
+                nameError.textContent = "Invalid name. Start name with a capital letter. Dont use double spaces.";
+                return false;
+            }
+            nameError.textContent = "";
+            return true;
+        }
+
+        /*function validateEmail() {
+            if (!emailPattern.test(emailField.value)) {
+                emailError.textContent = "Invalid email format popular domains are allowed.";
+                return false;
+            }
+            emailError.textContent = "";
+            return true;
+        }*/
+
+        function validateAddress() {
+            if (!addressPattern.test(addressField.value.trim()) || /\s{2,}/.test(addressField.value)) {
+                addressError.textContent = "Invalid address. No leading/trailing spaces.";
+                return false;
+            }
+            addressError.textContent = "";
+            return true;
+        }
+
+        function validatePhone() {
+            if (!phonePattern.test(phoneField.value) || /^(.)\1*$/.test(phoneField.value)) {
+                phoneError.textContent = "Invalid phone number. Follow the standard format.";
+                return false;
+            }
+            phoneError.textContent = "";
+            return true;
+        }
+        function validateCurrentPassword() {
+        if (currentPasswordField.value.trim() === '') {
+            currentPasswordError.textContent = "Current password is required.";
+            return false;
+        }
+        // You might want to implement server-side validation here to check if the current password matches
+        // For simplicity, assuming the validation happens server-side and the response is handled accordingly
+        // Replace the below condition with actual server-side validation response handling
+
+        // Example: if the current password does not match, display an error
+        const currentPasswordMatches = true; // Replace with actual validation result
+        if (!currentPasswordMatches) {
+            currentPasswordError.textContent = "Current password does not match.";
+            return false;
+        }
+        currentPasswordError.textContent = "";
+        return true;
+    }
+
+        function validatePassword() {
+            if (!passwordPattern.test(passwordField.value)) {
+                passwordError.textContent = "Include at least one capital letter,one small letter,one number, and one special character.";
+                return false;
+            }
+            passwordError.textContent = "";
+            return true;
+        }
+
+        function validateConfirmPassword() {
+            if (confirmPasswordField.value !== passwordField.value) {
+                confirmPasswordError.textContent = "Passwords do not match.";
+                return false;
+            }
+            confirmPasswordError.textContent = "";
+            return true;
+        }
+
+        function clearErrorMessages() {
+            nameError.textContent = "";
+            /*emailError.textContent = "";*/
+            addressError.textContent = "";
+            phoneError.textContent = "";
+            passwordError.textContent = "";
+            confirmPasswordError.textContent = "";
+        }
+        currentPasswordField.addEventListener('input', validateCurrentPassword);
+        nameField.addEventListener('input', validateName);
+       /* emailField.addEventListener('input', validateEmail);*/
+        addressField.addEventListener('input', validateAddress);
+        phoneField.addEventListener('input', validatePhone);
+        passwordField.addEventListener('input', validatePassword);
+        confirmPasswordField.addEventListener('input', validateConfirmPassword);
+        currentPasswordField.addEventListener('focus', clearErrorMessages);
+        nameField.addEventListener('focus', clearErrorMessages);
+        /*emailField.addEventListener('focus', clearErrorMessages);*/
+        addressField.addEventListener('focus', clearErrorMessages);
+        phoneField.addEventListener('focus', clearErrorMessages);
+        passwordField.addEventListener('focus', clearErrorMessages);
+        confirmPasswordField.addEventListener('focus', clearErrorMessages);
+
+       /* emailField.addEventListener('blur', function() {
+            const email = emailField.value;
+            if (validateEmail()) {
+                fetch(`/check_email/?email=${email}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.exists) {
+                            emailError.textContent = "Email already registered.";
+                        } else {
+                            emailError.textContent = "";
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            }
+        });*/
+
+        document.getElementById('edit-details').addEventListener('submit', function (event) {
+            if (!validateName() || !validateAddress() || !validatePhone()) {
+                event.preventDefault();
+            }
+        });
+        document.getElementById('change-password').addEventListener('submit', function (event) {
+            if (!validateCurrentPassword() ||!validatePassword() || !validateConfirmPassword()) {
+                event.preventDefault();
+            }
+        });
+    });
+</script>
+
+</html>

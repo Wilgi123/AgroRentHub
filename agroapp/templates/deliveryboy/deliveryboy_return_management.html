@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delivery Boy Dashboard - AgroRent Hub</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/deliveryboy/style.css' %}">
+    <script src="{% static 'js/deliveryboy/script.js' %}" defer></script>
+    <style>
+        
+        /* Return Product Button styling */
+        .return-button {
+            background: linear-gradient(135deg, #ff7700,#fe4501);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .return-button:hover {
+            background-color: #E64A19;
+        }
+
+        /* Modal Styling */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        .modal h2 {
+            margin-bottom: 20px;
+        }
+
+        .modal button {
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .modal #noDamageButton {
+            background: linear-gradient(135deg, #23c01d, #058305);
+            color: white;
+        }
+
+        .modal #damageButton {
+            background: linear-gradient(135deg, #f31212, #a8180b);
+            color: white;
+        }
+
+        .modal #cancelModal {
+            background-color: #ddd;
+            color: #333;
+        }
+    </style>
+</head>
+
+<body>
+    {% if request.session.user_id %}
+    <header>
+        <div class="logo">AgroRent DeliveryBoy Panel</div>
+        <nav>
+            <ul>
+                <a href="{% url 'deliveryboy_profile' %}" class="button profile">Profile</a>
+                <a href="{% url 'logout' %}" class="button logout">Sign Out</a>
+            </ul>
+        </nav>
+    </header>
+    <div class="container">
+        <div class="sidebar">
+            <nav>
+                <ul>
+                    <li><a href="{% url 'deliveryboy_index' %}" data-page="deliveryboy_index">Dashboard</a></li>
+                    <li><a href="{% url 'deliveryboy_view_order' %}" data-page="deliveryboy_view_order">View Orders</a></li>
+                    <li><a href="{% url 'deliveryboy_return_management' %}" data-page="deliveryboy_return_management">Return Management</a></li>
+                    <!--<li><a href="{% url 'deliveryboy_view_damages' %}" data-page="deliveryboy_view_damages">View Damaged Products</a></li>-->
+                    <li><a href="{% url 'deliveryboy_view_damages_chart' %}" data-page="deliveryboy_view_damages_chart">Repair Cost Details</a></li>
+
+                    <li><a href="{% url 'deliveryboy_deliveries' %}" data-page="deliveryboy_deliveries">My Deliveries</a></li>
+                    <li><a href="{% url 'deliveryboy_earnings' %}" data-page="deliveryboy_earnings">Earnings</a></li>
+                    <li><a href="{% url 'deliveryboy_support' %}" data-page="deliveryboy_support">Support</a></li>
+                </ul>
+            </nav>
+        </div>
+        <div class="main">
+            <h2>Assigned Orders</h2>
+            {% if orders %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Si.No</th>
+                        <th>Customer</th>
+                        <th>Product</th>
+                        <th>Supplier</th>
+                        <th>Quantity</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                        <th>Price</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ order.user.name }}</td>
+                        <td>{{ order.product.product_name }}</td>
+                        <td>{{ order.product.supplier.name }}</td>
+                        <td>{{ order.quantity }}</td>
+                        <td>{{ order.start_date }}</td>
+                        <td>{{ order.end_date }}</td>
+                        <td>₹{{ order.price }}</td>
+                        <td id="status-{{ order.id }}">
+                            {% if order.status == 'rented' %}
+                            <button class="return-button" data-order-id="{{ order.id }}">Return Product</button>
+                            {% elif order.status == 'collected' %}
+                            <p>Product Collected</p>
+                            {% endif %}
+                        </td>
+                        
+                        
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p>No assigned orders.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Modal HTML -->
+    <div class="modal" id="damageModal">
+        <h2>Is there any damage to the product?</h2>
+        <button id="noDamageButton">No</button>
+        <button id="damageButton">Yes</button>
+        <button id="cancelModal">Cancel</button>
+    </div>
+
+    <br>
+    <footer class="footer">
+        <p>&copy; 2024 AgroRent Hub. All rights reserved.</p>
+    </footer>
+    {% else %}
+    <div class="container">
+        <p>Access Denied</p>
+    </div>
+    {% endif %}
+
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+    const returnButtons = document.querySelectorAll('.return-button');
+    const modal = document.getElementById('damageModal');
+
+    returnButtons.forEach(button => {
+        button.addEventListener('click', function () {
+            const orderId = this.getAttribute('data-order-id');
+            modal.style.display = 'block';
+
+            // Remove existing event listeners if any
+            document.getElementById('noDamageButton').removeEventListener('click', noDamageHandler);
+            document.getElementById('damageButton').removeEventListener('click', damageHandler);
+            document.getElementById('cancelModal').removeEventListener('click', cancelHandler);
+
+            // Define event handlers
+            function noDamageHandler() {
+                fetch(`/process-return/${orderId}/?action=no_damages`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken') // Include CSRF token
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'collected') {
+                        // Find the relevant cell and update its content
+                        const statusCell = document.getElementById(`status-${orderId}`);
+                        statusCell.innerHTML = '<p>Product Collected</p>';  // Replace button with text
+                        modal.style.display = 'none';
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            }
+
+            function damageHandler() {
+                window.location.href = `/return-product/${orderId}/`; // Redirect to the return product form with the order ID
+            }
+
+            function cancelHandler() {
+                modal.style.display = 'none';
+            }
+
+            // Add event listeners
+            document.getElementById('noDamageButton').addEventListener('click', noDamageHandler);
+            document.getElementById('damageButton').addEventListener('click', damageHandler);
+            document.getElementById('cancelModal').addEventListener('click', cancelHandler);
+        });
+    });
+
+    // Function to get the CSRF token from cookies
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+});
+
+
+
+    </script>
+</body>
+
+</html>

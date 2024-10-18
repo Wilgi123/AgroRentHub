@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/admin/style.css' %}">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="{% static 'js/admin/script.js' %}" defer></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap" rel="stylesheet">
+    <script>
+        $(document).ready(function() {
+            $('#myTable').DataTable();
+        });
+    </script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+       
+        .navbar, .sidebar, .main, footer {
+            padding: 10px;
+        }
+        .navbar {
+            background-color: #4CAF50;
+            color: white;
+        }
+        
+        .sidebar a {
+            display: block;
+            color: white;
+            padding: 15px;
+            text-decoration: none;
+        }
+ 
+        .recent-activity, .notifications, .quick-actions {
+            background-color: white;
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            box-sizing: border-box;
+        }
+        .recent-activity h3, .notifications h3, .quick-actions h3 {
+            margin-top: 0;
+        }
+        .activity-list, .notification-list, .action-list {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+        .activity-list li, .notification-list li, .action-list li {
+            padding: 10px 0;
+            border-bottom: 1px solid #f4f4f4;
+        }
+        .btn-block {
+            background: linear-gradient(135deg, #23c01d, #058305);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-unblock {
+            background: linear-gradient(135deg, #f31212, #a8180b);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        footer {
+            text-align: center;
+            padding: 5px;
+            color: white;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
+            left: 0;
+            z-index: 1;
+            background-color: #4CAF50;
+        }
+         /* Modal Styles */
+         .modal {
+            display: none;
+            /* Hidden by default */
+            position: fixed;
+            /* Stay in place */
+            z-index: 1000;
+            /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%;
+            /* Full width */
+            height: 100%;
+            /* Full height */
+            background-color: rgba(0, 0, 0, 0.5);
+            /* Black with opacity */
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            /* 15% from the top and centered */
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            /* Could be more or less, depending on screen size */
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    {% if request.session.user_id %}
+    <header>
+        <div class="logo">AgroRent Admin Panel</div>
+        <nav>
+            <ul>
+                <li><b><a href="{% url 'logout' %}">SignOut</a></b></li>
+            </ul>
+        </nav>
+    </header>
+    <div class="sidebar">
+        <a href="{% url 'admin_index' %}" data-page="admin_index">Dashboard</a>
+        <a href="{% url 'admin_view_farmer' %}" data-page="admin_view_pro">View Farmers</a>
+        <a href="{% url 'admin_view_supplier' %}" data-page="admin_view_pro">View Suppliers</a>
+        <a href="{% url 'admin_view_deliveryboy' %}" data-page="admin_view_del">View Delivery Boys</a>
+        <a href="{% url 'admin_view_pro' %}" data-page="admin_view_pro">View Rental Product</a>
+        <a href="{% url 'admin_view_cat' %}" data-page="admin_view_cat">View Category</a>
+        <a href="{% url 'admin_view_order' %}" data-page="admin_view_order">View Orders</a>
+        <a href="{% url 'admin_view_damagedpro' %}" data-page="admin_view_damagedpro">View Damaged Products</a>
+    </div>
+    <div class="main">
+        <h1>Delivery Boys</h1>
+        <table id="myTable" class="display">
+            <thead>
+                <tr>
+                    <th>Si.No</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Address</th>
+                    <th>Phone</th>
+                    <th>Last Login</th>
+                    <th>Status</th>
+                    <th>Action</th> <!-- Added Action Column -->
+                </tr>
+            </thead>
+            <tbody>
+                {% for delivery_boy in delivery_boys %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ delivery_boy.name }}</td>
+                    <td>{{ delivery_boy.email }}</td>
+                    <td>{{ delivery_boy.address }}</td>
+                    <td>{{ delivery_boy.phone }}</td>
+                    <td>{{ delivery_boy.last_login }}</td>
+                    <td>{{ delivery_boy.status }}</td>
+                    <td>
+                        {% if delivery_boy.status == 'active' %}
+                        <button class="btn-block" data-user-id="{{ delivery_boy.id }}" data-user-type="deliveryboy"
+                            onclick="openBlockModal(this)">Block</button>
+                        {% else %}
+                        <button class="btn-unblock" onclick="toggleUserStatus('deliveryboy', {{ delivery_boy.id }})">Unblock</button>
+                        {% endif %}
+                    </td>
+                    
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <!-- Block Reason Modal -->
+        <div id="blockModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeBlockModal()">&times;</span>
+                <h2>Select Reason for Blocking</h2>
+                <form id="blockForm">
+                    <label for="reason">Reason:</label>
+                    <select id="reason" name="reason">
+                        <option value="Repeated cancellations of orders.">Repeated cancellations of orders.</option>
+                        <option value="Engaged in fraudulent activities.">Engaged in fraudulent activities.</option>
+                        <option value="Spamming or abusive behavior.">Spamming or abusive behavior.</option>
+                        <option value="Non-payment or unresolved payment disputes.">Non-payment or unresolved payment
+                            disputes.</option>
+                        <option value="Creating multiple fake accounts.">Creating multiple fake accounts.</option>
+                        <option value="Misuse or damage of rented products.">Misuse or damage of rented products.
+                        </option>
+                        <option value="Involvement in unlawful activities.">Involvement in unlawful activities.</option>
+                        <option value="Account inactive for an extended period.">Account inactive for an extended
+                            period.</option>
+                        <option value="False or misleading reviews and feedback.">False or misleading reviews and
+                            feedback.</option>
+                        <option value="Excessive complaints without valid reasons.">Excessive complaints without valid
+                            reasons.</option>
+                        <option value="Unauthorized access or hacking attempts.">Unauthorized access or hacking
+                            attempts.</option>
+                        <option value="Violation of terms and conditions.">Violation of terms and conditions.</option>
+                        <option value="Inappropriate communication with admins or support.">Inappropriate communication
+                            with admins or support.</option>
+                    </select>
+                    <input type="hidden" id="userId" name="user_id">
+                    <input type="hidden" id="userType" name="user_type">
+                    <button type="button" onclick="submitBlockForm()">Block User</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <footer>
+        <p>&copy; 2024 Agriculture Rental Hub. All rights reserved.</p>
+    </footer>
+    <!-- Scripts and footer -->
+    <script>
+        function openBlockModal(button) {
+            document.getElementById('userId').value = button.dataset.userId;
+            document.getElementById('userType').value = button.dataset.userType;
+            document.getElementById('blockModal').style.display = 'block';
+        }
+
+        function closeBlockModal() {
+            document.getElementById('blockModal').style.display = 'none';
+        }
+    </script>
+
+<script>
+    function openBlockModal(button) {
+        document.getElementById('userId').value = button.dataset.userId;
+        document.getElementById('userType').value = button.dataset.userType;
+        document.getElementById('blockModal').style.display = 'block';
+    }
+
+    function closeBlockModal() {
+        document.getElementById('blockModal').style.display = 'none';
+    }
+
+    function submitBlockForm() {
+        const userId = document.getElementById('userId').value;
+        const userType = document.getElementById('userType').value;
+        const reason = document.getElementById('reason').value;
+
+        fetch(`/block_user/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken'),
+            },
+            body: JSON.stringify({ user_id: userId, user_type: userType, reason: reason }),
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const button = document.querySelector(`[data-user-id="${userId}"][data-user-type="${userType}"]`);
+                    button.textContent = 'Unblock';
+                    button.className = 'btn-unblock';
+                    button.onclick = function () {
+                        toggleUserStatus(userType, userId);
+                    };
+                    closeBlockModal();
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    function toggleUserStatus(userType, userId) {
+        fetch(`/toggle_user_status/${userType}/${userId}/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken'),
+            },
+        })
+            .then(response => response.json())
+            .then(data => {
+                const button = document.querySelector(`[data-user-id="${userId}"][data-user-type="${userType}"]`);
+                if (data.status === 'active') {
+                    button.textContent = 'Block';
+                    button.className = 'btn-block';
+                    button.onclick = function () {
+                        openBlockModal(this);
+                    };
+                } else {
+                    button.textContent = 'Unblock';
+                    button.className = 'btn-unblock';
+                    button.onclick = function () {
+                        toggleUserStatus(userType, userId);
+                    };
+                }
+                const statusCell = button.parentElement.previousElementSibling;
+                statusCell.textContent = data.status;
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+</script>
+<script>
+    $(document).ready(function () {
+        $('#farmersTable').DataTable();
+    });
+
+    function submitBlockForm() {
+        const userId = document.getElementById('userId').value;
+        const userType = document.getElementById('userType').value;
+        const reason = document.getElementById('reason').value;
+
+        fetch(`/block_user/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken'),
+            },
+            body: JSON.stringify({ user_id: userId, user_type: userType, reason: reason }),
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const button = document.querySelector(`[data-user-id="${userId}"][data-user-type="${userType}"]`);
+                    button.textContent = 'Unblock';
+                    button.className = 'btn-unblock';
+                    button.onclick = function () {
+                        toggleUserStatus(userType, userId);
+                    };
+                    const statusCell = button.closest('tr').querySelector('td:nth-child(7)'); // Select the status cell
+                    statusCell.textContent = 'blocked'; // Update the status in the table
+                    closeBlockModal();
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    // Function to get CSRF token from cookies
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+</script>
+
+
+
+    {% else %}
+    <p>Access Denied</p>
+    {% endif %}
+</body>
+</html>

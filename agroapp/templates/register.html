@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - AgroRent Hub</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <style>
+        .error {
+            color: red;
+            font-size: 16px;
+            margin-top: -10px;
+            margin-bottom: 10px;
+            font-weight: 800;
+        }
+    </style>
+</head>
+<body>
+    <div class="full-page">
+        <div class="navbar">
+            <div>
+                <a href="{% url 'index' %}">AgroRent Hub</a>
+            </div>
+            <nav>
+                <ul id="MenuItems">
+                    <li><a href="{% url 'index' %}">Home</a></li>
+                    <li><a href="{% url 'about_us' %}">About Us</a></li>
+                    <li><a href="{% url 'services' %}">Services</a></li>
+                    <li><a href="{% url 'rental_items' %}">Products</a></li>
+                    <li><a href="{% url 'contact' %}">Contact</a></li>
+                    <li><a href="{% url 'login' %}">Login</a></li>
+                    <li><a href="{% url 'register' %}">Register</a></li>
+                </ul>
+            </nav>
+        </div>
+        <div class="content-section">
+            <div class="form-box-register">
+                <form class="input-group-register" method="post" action="{% url 'register' %}" onsubmit="return validateForm()" id="registerForm">
+                    {% csrf_token %}
+                    <h1 style="color: white; text-align: center; margin-top: 0;">Register</h1>
+
+                    <div>
+                        <input type="text" class="input-field" placeholder="Name" name="name" id="name" required>
+                    </div><br>
+                    <p id="nameError" class="error"></p>
+                    <div>
+                        <input type="email" class="input-field" placeholder="Email" name="email" id="email" required>
+                    </div><br>
+                    <p id="emailError" class="error"></p>
+                    <div>
+                        <input type="text" class="input-field" placeholder="Address" name="address" id="address" required>
+                    </div><br>
+                    <p id="addressError" class="error"></p>
+                    <div>
+                        <input type="tel" class="input-field" placeholder="Phone No" name="phone" id="phone" required>
+                    </div><br>
+                    <p id="phoneError" class="error"></p>
+                    <div>
+                        <input type="password" class="input-field" placeholder="Password" name="password" id="password" required>
+                    </div><br>
+                    <p id="passwordError" class="error"></p>
+                    <div>
+                        <input type="password" class="input-field" placeholder="Confirm Password" id="confirmPassword" required>
+                    </div><br>
+                    <p id="confirmPasswordError" class="error"></p><br>
+                    <div class="radio-buttons">
+                        <label for="farmer" style="color: white;">
+                            <input type="radio" id="farmer" name="user_type" value="farmer" required> Farmer
+                        </label>&nbsp;&nbsp;
+                        <label for="supplier" style="color: white;">
+                            <input type="radio" id="supplier" name="user_type" value="supplier" required> Supplier
+                        </label>&nbsp;&nbsp;
+                        <label for="delivery_boy" style="color: white;">
+                            <input type="radio" id="delivery_boy" name="user_type" value="delivery_boy" required> Delivery Boy
+                        </label>
+                    </div><br>
+                    
+                    <button type="submit" class="submit-btn">Register</button><br>
+                    <div class="social-login">
+                       <!-- <h2 style="color: white; text-align: center;">Or Sign In with</h2>-->
+                        <a href="{% url 'social:begin' 'google-oauth2' %}" class="google-btn">
+                            <img src="{% static 'images/google_signin_button.png' %}" alt="Google Sign-In" width="280" height="40">
+                        </a>
+                    </div>
+                    
+                    <p style="color: white; text-align: center; font-size: 20px;">Already have an account? <a href="{% url 'login' %}" style="color: aqua; font-size: 20px;">Login</a></p>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const nameField = document.getElementById('name');
+            const emailField = document.getElementById('email');
+            const addressField = document.getElementById('address');
+            const phoneField = document.getElementById('phone');
+            const passwordField = document.getElementById('password');
+            const confirmPasswordField = document.getElementById('confirmPassword');
+
+            const nameError = document.getElementById('nameError');
+            const emailError = document.getElementById('emailError');
+            const addressError = document.getElementById('addressError');
+            const phoneError = document.getElementById('phoneError');
+            const passwordError = document.getElementById('passwordError');
+            const confirmPasswordError = document.getElementById('confirmPasswordError');
+
+            const namePattern = /^[A-Z][a-zA-Z\s.]*$/;
+            const emailPattern = /^[a-zA-Z0-9._%+-]+@(gmail\.com|yahoo\.com|mca\.ajce\.in)$/;
+            const phonePattern = /^[6-9][0-9]{9,13}$/;
+            const addressPattern = /^[a-zA-Z0-9.,\s]+$/;
+            const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
+            function validateName() {
+                const nameValue = nameField.value.trim();
+                if (!namePattern.test(nameValue) || /\s{2,}/.test(nameValue) || /^\s/.test(nameValue)) {
+                    nameError.textContent = "Invalid name. Start with a capital letter";
+                    return false;
+                }
+                nameError.textContent = "";
+                return true;
+            }
+
+            function validateEmail() {
+                if (!emailPattern.test(emailField.value)) {
+                    emailError.textContent = "Invalid email format popular domains are allowed.";
+                    return false;
+                }
+                emailError.textContent = "";
+                return true;
+            }
+
+            function validateAddress() {
+                if (!addressPattern.test(addressField.value.trim()) || /\s{2,}/.test(addressField.value)) {
+                    addressError.textContent = "Invalid address. No leading/trailing spaces.";
+                    return false;
+                }
+                addressError.textContent = "";
+                return true;
+            }
+
+            function validatePhone() {
+                if (!phonePattern.test(phoneField.value) || /^(.)\1*$/.test(phoneField.value)) {
+                    phoneError.textContent = "Invalid phone number. Follow the standard format.";
+                    return false;
+                }
+                phoneError.textContent = "";
+                return true;
+            }
+
+            function validatePassword() {
+                if (!passwordPattern.test(passwordField.value)) {
+                    passwordError.textContent = "Include at least one capital letter,one small letter,one number, and one special character.";
+                    return false;
+                }
+                passwordError.textContent = "";
+                return true;
+            }
+
+            function validateConfirmPassword() {
+                if (confirmPasswordField.value !== passwordField.value) {
+                    confirmPasswordError.textContent = "Passwords do not match.";
+                    return false;
+                }
+                confirmPasswordError.textContent = "";
+                return true;
+            }
+
+            function clearErrorMessages() {
+                nameError.textContent = "";
+                emailError.textContent = "";
+                addressError.textContent = "";
+                phoneError.textContent = "";
+                passwordError.textContent = "";
+                confirmPasswordError.textContent = "";
+            }
+
+            nameField.addEventListener('input', validateName);
+            emailField.addEventListener('input', validateEmail);
+            addressField.addEventListener('input', validateAddress);
+            phoneField.addEventListener('input', validatePhone);
+            passwordField.addEventListener('input', validatePassword);
+            confirmPasswordField.addEventListener('input', validateConfirmPassword);
+
+            nameField.addEventListener('focus', clearErrorMessages);
+            emailField.addEventListener('focus', clearErrorMessages);
+            addressField.addEventListener('focus', clearErrorMessages);
+            phoneField.addEventListener('focus', clearErrorMessages);
+            passwordField.addEventListener('focus', clearErrorMessages);
+            confirmPasswordField.addEventListener('focus', clearErrorMessages);
+
+            emailField.addEventListener('blur', function() {
+                const email = emailField.value;
+                if (validateEmail()) {
+                    fetch(`/check_email/?email=${email}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.exists) {
+                                emailError.textContent = "Email already registered.";
+                            } else {
+                                emailError.textContent = "";
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                        });
+                }
+            });
+
+            document.getElementById('registerForm').addEventListener('submit', function (event) {
+                if (!validateName() || !validateEmail() || !validateAddress() || !validatePhone() || !validatePassword() || !validateConfirmPassword()) {
+                    event.preventDefault();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

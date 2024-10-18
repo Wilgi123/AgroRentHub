@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supplier Profile</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/supplier/style.css' %}">
+    <script src="{% static 'js/supplier/script.js' %}" defer></script>
+</head>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f4;
+    }
+    .logo {
+        font-size: 24px;
+        font-weight: bold;
+    }
+    .navbar, .sidebar, .main, footer {
+        padding: 10px;
+    }
+    .navbar {
+        background-color: #4CAF50;
+        color: white;
+    }
+
+    .sidebar a {
+        display: block;
+        color: white;
+        padding: 15px;
+        text-decoration: none;
+    }
+    .sidebar a:hover {
+        background-color: #575757;
+    }
+    .main {
+        margin-left: 220px;
+        padding: 20px;
+        min-height: calc(100vh - 60px); /* Adjusted to account for header height */
+    }
+    .content h3, .content p {
+        margin: 0 0 10px 0;
+    }
+    .buttons {
+        margin: 20px 0;
+    }
+    .buttons button {
+        padding: 10px 20px;
+        margin-right: 10px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        cursor: pointer;
+    }
+    .buttons button:hover {
+        background-color: #45a049;
+    }
+    .form-container {
+        display: none;
+        margin: 20px 0;
+        padding: 20px;
+        background-color: white;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+    .form-container input[type="text"], .form-container input[type="email"], .form-container input[type="password"] {
+        width: 100%;
+        padding: 10px;
+        margin: 10px 0;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+    .form-container input[type="submit"] {
+        padding: 10px 20px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        cursor: pointer;
+    }
+    .form-container input[type="submit"]:hover {
+        background-color: #45a049;
+    }
+    .error {
+        color: red;
+        font-size: 14px;
+    }
+    footer {
+        text-align: center;
+        padding: 10px;
+        background-color: #4CAF50;
+        color: white;
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+</style>
+<body>
+    {% if request.session.user_id %}
+    <header>
+        <div class="logo">AgroRent Supplier Panel</div>
+        <nav>
+            <ul>
+                <li><a href="{% url 'supplier_profile' %}">Profile</a></li>
+                <li><a href="{% url 'logout' %}">SignOut</a></li>
+            </ul>
+        </nav>
+    </header>
+    <div class="sidebar">
+        <a href="{% url 'supplier_index' %}" data-page="supplier_index">Dashboard</a>
+        <a href="{% url 'supplier_add_pro' %}" data-page="supplier_add_pro">Add Rental Products</a>
+        <a href="{% url 'supplier_view_pro' %}" data-page="supplier_view_pro">View Rental Products</a>
+        <a href="{% url 'supplier_add_cat' %}" data-page="supplier_add_cat">Add Categories</a>
+        <a href="{% url 'supplier_view_cat' %}" data-page="supplier_view_cat">View Categories</a>
+        <a href="{% url 'add_product_damage' %}" data-page="supplier_add_pro">Add Cost For Damaged Product</a>
+        <a href="{% url 'view_product_damage' %}" data-page="supplier_add_pro">View Cost For Damaged Product</a>
+        <a href="{% url 'supplier_view_order' %}" data-page="supplier_view_order">View Orders</a>
+         <!--<a href="{% url 'supplier_add_del' %}" data-page="supplier_add_del">ADD DELIVERYBOY</a>
+        <a href="{% url 'supplier_view_del' %}" data-page="supplier_view_del">VIEW DELIVERY BOY</a>
+        <a href="{% url 'supplier_add_worker' %}" data-page="supplier_add_worker">ADD WORKERS</a>
+        <a href="{% url 'supplier_view_worker' %}" data-page="supplier_view_worker">VIEW WORKERS</a>
+        <a href="{% url 'supplier_view_order' %}" data-page="supplier_view_order">VIEW ORDERS</a>-->
+    </div>
+    <div class="main">
+        <h2>Supplier Profile</h2>
+        <div class="content">
+            <h3>Name: {{ supplier.name }}</h3>
+            <p>Email: {{ supplier.email }}</p>
+            <p>Address: {{ supplier.address }}</p>
+            <p>Phone: {{ supplier.phone }}</p>
+        </div>
+        <div class="buttons">
+            <button id="edit-details-button">Edit Details</button>
+            <button id="change-password-button">Change Password</button>
+        </div>
+        <div id="edit-details-form" class="form-container">
+            <h3>Edit Details</h3>
+            <form method="POST" action="{% url 'supplier_edit_details' %}" id="editDetailsForm">
+                {% csrf_token %}
+                <input type="text" id="name" name="name" value="{{ supplier.name }}" required>
+                <p id="nameError" class="error"></p>
+                <input type="text" id="address" name="address" value="{{ supplier.address }}" required>
+                <p id="addressError" class="error"></p>
+                <input type="text" id="phone" name="phone" value="{{ supplier.phone }}" required>
+                <p id="phoneError" class="error"></p>
+                <input type="submit" value="Update">
+            </form>
+        </div>
+        <div id="change-password-form" class="form-container">
+            <h3>Change Password</h3>
+            <form id="changePasswordForm" method="POST" action="{% url 'supplier_change_password' %}">
+                {% csrf_token %}
+                <input type="password" id="current-password" name="current-password" placeholder="Current Password" ><br>
+                <p id="currentPasswordError" class="error"></p>
+                <input type="password" id="password" name="password" placeholder="New Password" required>
+                <p id="passwordError" class="error"></p>
+                <input type="password" id="confirmPassword" name="confirm_password" placeholder="Confirm Password" required>
+                <p id="confirmPasswordError" class="error"></p><br>
+                <input type="submit" value="Change Password">
+            </form>
+        </div>
+    </div><br><br>
+    <footer>
+        <p>&copy; 2024 Agriculture Rental Hub. All rights reserved.</p>
+    </footer>
+    <script>
+        document.getElementById('edit-details-button').addEventListener('click', function() {
+            document.getElementById('edit-details-form').style.display = 'block';
+            document.getElementById('change-password-form').style.display = 'none';
+        });
+
+        document.getElementById('change-password-button').addEventListener('click', function() {
+            document.getElementById('edit-details-form').style.display = 'none';
+            document.getElementById('change-password-form').style.display = 'block';
+        });
+
+      
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const nameField = document.getElementById('name');
+            const addressField = document.getElementById('address');
+            const phoneField = document.getElementById('phone');
+            const passwordField = document.getElementById('password');
+            const confirmPasswordField = document.getElementById('confirmPassword');
+
+            const nameError = document.getElementById('nameError');
+            const addressError = document.getElementById('addressError');
+            const phoneError = document.getElementById('phoneError');
+            const passwordError = document.getElementById('passwordError');
+            const confirmPasswordError = document.getElementById('confirmPasswordError');
+
+            const namePattern = /^[A-Z][a-zA-Z\s.]*$/;
+            const phonePattern = /^[6-9][0-9]{9,13}$/;
+            const addressPattern = /^[a-zA-Z0-9.,\s]+$/;
+            const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
+            function validateName() {
+                const nameValue = nameField.value.trim();
+                if (!namePattern.test(nameValue) || /\s{2,}/.test(nameValue) || /^\s/.test(nameValue)) {
+                    nameError.textContent = "Invalid name. Start with a capital letter";
+                    return false;
+                }
+                nameError.textContent = "";
+                return true;
+            }
+
+            function validateAddress() {
+                if (!addressPattern.test(addressField.value.trim()) || /\s{2,}/.test(addressField.value)) {
+                    addressError.textContent = "Invalid address. No leading/trailing spaces.";
+                    return false;
+                }
+                addressError.textContent = "";
+                return true;
+            }
+
+            function validatePhone() {
+                if (!phonePattern.test(phoneField.value) || /^(.)\1*$/.test(phoneField.value)) {
+                    phoneError.textContent = "Invalid phone number. Follow the standard format.";
+                    return false;
+                }
+                phoneError.textContent = "";
+                return true;
+            }
+
+            function validatePassword() {
+                if (!passwordPattern.test(passwordField.value)) {
+                    passwordError.textContent = "Include at least one capital letter, one small letter, one number, and one special character.";
+                    return false;
+                }
+                passwordError.textContent = "";
+                return true;
+            }
+
+            function validateConfirmPassword() {
+                if (confirmPasswordField.value !== passwordField.value) {
+                    confirmPasswordError.textContent = "Passwords do not match.";
+                    return false;
+                }
+                confirmPasswordError.textContent = "";
+                return true;
+            }
+
+            function clearErrorMessages() {
+                nameError.textContent = "";
+                addressError.textContent = "";
+                phoneError.textContent = "";
+                passwordError.textContent = "";
+                confirmPasswordError.textContent = "";
+            }
+
+            nameField.addEventListener('input', validateName);
+            addressField.addEventListener('input', validateAddress);
+            phoneField.addEventListener('input', validatePhone);
+            passwordField.addEventListener('input', validatePassword);
+            confirmPasswordField.addEventListener('input', validateConfirmPassword);
+
+            nameField.addEventListener('focus', clearErrorMessages);
+            addressField.addEventListener('focus', clearErrorMessages);
+            phoneField.addEventListener('focus', clearErrorMessages);
+            passwordField.addEventListener('focus', clearErrorMessages);
+            confirmPasswordField.addEventListener('focus', clearErrorMessages);
+
+            document.getElementById('editDetailsForm').addEventListener('submit', function (event) {
+                if (!validateName() || !validateAddress() || !validatePhone()) {
+                    event.preventDefault();
+                }
+            });
+
+            document.getElementById('changePasswordForm').addEventListener('submit', function (event) {
+                if (!validatePassword() || !validateConfirmPassword()) {
+                    event.preventDefault();
+                }
+            });
+        });
+    </script>
+    {% else %}
+    <p>Access Denied</p>
+    {% endif %}
+</body>
+</html>

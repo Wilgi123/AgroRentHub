@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Product</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/supplier/style.css' %}">
+    <script src="{% static 'js/supplier/script.js' %}" defer></script>
+</head>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f4;
+    }
+    .logo {
+        font-size: 24px;
+        font-weight: bold;
+    }
+    .navbar, .sidebar, .main, footer {
+        padding: 10px;
+    }
+    .navbar {
+        background-color: #4CAF50;
+        color: white;
+    }
+    .sidebar a {
+        display: block;
+        color: white;
+        padding: 15px;
+        text-decoration: none;
+    }
+    .sidebar a:hover {
+        background-color: #575757;
+    }
+    .main {
+        margin-left: 220px;
+        padding: 20px;
+        min-height: calc(100vh - 60px); /* Adjusted to account for header height */
+    }
+    .stats {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+    .stat-box {
+        background-color: white;
+        padding: 20px;
+        border-radius: 10px;
+        flex: 1 1 calc(33.333% - 40px);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .stat-box .icon {
+        font-size: 2rem;
+        color: #4CAF50;
+    }
+    .stat-box .details {
+        text-align: right;
+    }
+    .stat-box .details h3 {
+        margin: 0;
+        font-size: 1.5rem;
+    }
+    .stat-box .details p {
+        margin: 0;
+        color: #777;
+    }
+</style>
+<body>
+    <header>
+        <div class="logo">AgroRent Supplier Panel</div>
+        <nav>
+            <ul>
+                <li><a href="{% url 'supplier_profile' %}">Profile</a></li>
+                <li><a href="{% url 'logout' %}">SignOut</a></li>
+            </ul>
+        </nav>
+    </header>
+    <div class="sidebar">
+        <a href="{% url 'supplier_index' %}" data-page="supplier_index">Dashboard</a>
+        <a href="{% url 'supplier_add_pro' %}" data-page="supplier_add_pro">Add Rental Products</a>
+        <a href="{% url 'supplier_view_pro' %}" data-page="supplier_view_pro">View Rental Products</a>
+        <a href="{% url 'supplier_add_cat' %}" data-page="supplier_add_cat">Add Categories</a>
+        <a href="{% url 'supplier_view_cat' %}" data-page="supplier_view_cat">View Categories</a>
+        <a href="{% url 'add_product_damage' %}" data-page="supplier_add_pro">Add Cost For Damaged Product</a>
+        <a href="{% url 'view_product_damage' %}" data-page="supplier_add_pro">View Cost For Damaged Product</a>
+        <a href="{% url 'supplier_view_order' %}" data-page="supplier_view_order">View Orders</a>
+        <!--<a href="{% url 'supplier_add_del' %}" data-page="supplier_add_del">ADD DELIVERYBOY</a>
+        <a href="{% url 'supplier_view_del' %}" data-page="supplier_view_del">VIEW DELIVERY BOY</a>
+        <a href="{% url 'supplier_add_worker' %}" data-page="supplier_add_worker">ADD WORKERS</a>
+        <a href="{% url 'supplier_view_worker' %}" data-page="supplier_view_worker">VIEW WORKERS</a>
+        <a href="{% url 'supplier_view_order' %}" data-page="supplier_view_order">VIEW ORDERS</a>-->
+    </div>
+    <div class="main" id="main-content">
+        <h2>Update Product</h2>
+        <form action="" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <label for="product_name">Product Name:</label>
+            <input type="text" id="product_name" name="product_name" value="{{ product.product_name }}" required><br><br>
+            
+            <label for="product_price_per_day">Product Price Per Day:</label>
+            <input type="number" id="product_price_per_day" name="product_price_per_day" step="0.01" value="{{ product.product_price_per_day }}" required><br><br>
+            
+            <label for="stock_quantity">Stock Quantity:</label>
+            <input type="number" id="stock_quantity" name="stock_quantity" value="{{ product.stock_quantity }}" required><br><br>
+            
+            <label for="product_description">Product Description:</label>
+            <textarea id="product_description" name="product_description" required>{{ product.product_description }}</textarea><br><br>
+            
+            <label for="status">Status:</label>
+            <select id="status" name="status" required>
+                <option value="available" {% if product.status == 'available' %}selected{% endif %}>Available</option>
+                <option value="rented" {% if product.status == 'rented' %}selected{% endif %}>Rented</option>
+                <option value="maintenance" {% if product.status == 'maintenance' %}selected{% endif %}>Maintenance</option>
+            </select><br><br>
+            
+            <label for="product_image">Product Image:</label>
+            <input type="file" id="product_image" name="product_image"><br><br>
+            
+            <button type="submit">Update Product</button>
+        </form><br><br><br><br>
+    </div>
+    <footer>
+        <p>&copy; 2024 Agriculture Rental Hub. All rights reserved.</p>
+    </footer>
+</body>
+</html>

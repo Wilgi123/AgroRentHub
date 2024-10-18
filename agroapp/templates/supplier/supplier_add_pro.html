@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Rental Product</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/supplier/style.css' %}">
+    <script src="{% static 'js/supplier/script.js' %}" defer></script>
+</head>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f4;
+    }
+
+    .logo {
+        font-size: 24px;
+        font-weight: bold;
+    }
+
+    .navbar,
+    .sidebar,
+    .main,
+    footer {
+        padding: 10px;
+    }
+
+    .navbar {
+        background-color: #4CAF50;
+        color: white;
+    }
+
+    .sidebar a {
+        display: block;
+        color: white;
+        padding: 15px;
+        text-decoration: none;
+    }
+
+    .sidebar a:hover {
+        background-color: #575757;
+    }
+
+    .main {
+        margin-left: 220px;
+        padding: 20px;
+        min-height: calc(100vh - 60px);
+        /* Adjusted to account for header height */
+    }
+
+    .stats {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+
+    .stat-box {
+        background-color: white;
+        padding: 20px;
+        border-radius: 10px;
+        flex: 1 1 calc(33.333% - 40px);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .stat-box .icon {
+        font-size: 2rem;
+        color: #4CAF50;
+    }
+
+    .stat-box .details {
+        text-align: right;
+    }
+
+    .stat-box .details h3 {
+        margin: 0;
+        font-size: 1.5rem;
+    }
+
+    .stat-box .details p {
+        margin: 0;
+        color: #777;
+    }
+
+    .error-message {
+        color: red;
+        font-size: 0.875rem;
+        margin-top: 5px;
+    }
+</style>
+
+<body>
+    {% if request.session.user_id %}
+    <header>
+        <div class="logo">AgroRent Supplier Panel</div>
+        <nav>
+            <ul>
+                <li><a href="{% url 'supplier_profile' %}">Profile</a></li>
+                <li><a href="{% url 'logout' %}">SignOut</a></li>
+            </ul>
+        </nav>
+    </header>
+    <div class="sidebar">
+        <a href="{% url 'supplier_index' %}" data-page="supplier_index">Dashboard</a>
+        <a href="{% url 'supplier_add_pro' %}" data-page="supplier_add_pro">Add Rental Products</a>
+        <a href="{% url 'supplier_view_pro' %}" data-page="supplier_view_pro">View Rental Products</a>
+        <a href="{% url 'supplier_add_cat' %}" data-page="supplier_add_cat">Add Categories</a>
+        <a href="{% url 'supplier_view_cat' %}" data-page="supplier_view_cat">View Categories</a>
+        <a href="{% url 'add_product_damage' %}" data-page="supplier_add_pro">Add Cost For Damaged Product</a>
+        <a href="{% url 'view_product_damage' %}" data-page="supplier_add_pro">View Cost For Damaged Product</a>
+        <a href="{% url 'supplier_view_order' %}" data-page="supplier_view_order">View Orders</a>
+        <!--<a href="{% url 'supplier_add_del' %}" data-page="supplier_add_del">ADD DELIVERYBOY</a>
+        <a href="{% url 'supplier_view_del' %}" data-page="supplier_view_del">VIEW DELIVERY BOY</a>
+        <a href="{% url 'supplier_add_worker' %}" data-page="supplier_add_worker">ADD WORKERS</a>
+        <a href="{% url 'supplier_view_worker' %}" data-page="supplier_view_worker">VIEW WORKERS</a>
+        <a href="{% url 'supplier_view_order' %}" data-page="supplier_view_order">VIEW ORDERS</a>-->
+    </div>
+    <div class="main" id="main-content">
+        <h2>Add Rental Product</h2>
+        <form action="{% url 'supplier_add_pro' %}" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <label for="product_name">Product Name:</label>
+            <input type="text" id="product_name" name="product_name" required>
+            <div id="product_name_error" class="error-message"></div> <!-- Error message container -->
+            <br>
+
+            <label for="product_price_per_day">Product Price Per Day:</label>
+            <input type="number" id="product_price_per_day" name="product_price_per_day" step="0.01" required>
+            <div id="product_price_error" class="error-message"></div> <!-- Error message container -->
+            <br>
+
+            <label for="stock_quantity">Stock Quantity:</label>
+            <input type="number" id="stock_quantity" name="stock_quantity" required>
+            <div id="stock_quantity_error" class="error-message"></div> <!-- Error message container -->
+            <br>
+
+            <label for="product_description">Product Description:</label>
+            <textarea id="product_description" name="product_description" required></textarea>
+            <div id="product_description_error" class="error-message"></div> <!-- Error message container -->
+            <br>
+
+            <label for="status">Status:</label>
+            <select id="status" name="status" required>
+                <option value="available">Available</option>
+                <option value="rented">Rented</option>
+                <option value="maintenance">Maintenance</option>
+            </select>
+            <div id="status_error" class="error-message"></div> <!-- Error message container -->
+            <br>
+
+            <label for="category">Category:</label>
+            <select id="category" name="category" required>
+                {% for category in categories %}
+                <option value="{{ category.id }}">{{ category.name }}</option>
+                {% endfor %}
+            </select>
+            <div id="category_error" class="error-message"></div> <!-- Error message container -->
+            <br>
+
+            <label for="product_image">Product Image:</label>
+            <input type="file" id="product_image" name="product_image" required>
+            <div id="product_image_error" class="error-message"></div> <!-- Error message container -->
+            <br>
+
+            <button type="submit">Add Product</button>
+        </form>
+
+    </div><br><br><br><br><br>
+    <footer>
+        <p>&copy; 2024 Agriculture Rental Hub. All rights reserved.</p>
+    </footer>
+    {% else %}
+    <p>Access Denied</p>
+    {% endif %}
+</body>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const form = document.querySelector("form");
+
+        // Helper function to create and show error messages
+        function showError(input, message) {
+            clearError(input); // Clear existing error messages
+            const errorDiv = document.createElement("div");
+            errorDiv.className = "error-message";
+            errorDiv.textContent = message;
+            input.parentNode.insertBefore(errorDiv, input.nextSibling); // Insert error message after the input field
+        }
+
+        // Helper function to remove error messages
+        function clearError(input) {
+            const errorDiv = input.parentNode.querySelector(".error-message");
+            if (errorDiv) {
+                errorDiv.remove();
+            }
+        }
+
+        // Validation functions for each field
+        function validateProductName() {
+            const input = document.getElementById("product_name");
+            const value = input.value.trim();
+            clearError(input);
+
+            if (value.length < 3 || value.length > 100) {
+                showError(input, "Product name must be between 3 to 100 characters.");
+                return false;
+            }
+
+            // Check if the product name contains only letters (and spaces or hyphens)
+            if (!/^[a-zA-Z\s\-]+$/.test(value)) {
+                showError(input, "Product name can only contain letters, spaces, and hyphens.");
+                return false;
+            }
+            return true;
+        }
+
+        function validateProductPrice() {
+            const input = document.getElementById("product_price_per_day");
+            const value = parseFloat(input.value);
+            clearError(input);
+
+            if (isNaN(value) || value <= 0) {
+                showError(input, "Please enter a valid price greater than zero.");
+                return false;
+            }
+
+            if (value < 1 || value > 10000) {
+                showError(input, "Price must be between Rs.1 and Rs.10,000.");
+                return false;
+            }
+
+            return true;
+        }
+
+        function validateStockQuantity() {
+            const input = document.getElementById("stock_quantity");
+            const value = parseInt(input.value, 10);
+            clearError(input);
+
+            if (isNaN(value) || value < 0) {
+                showError(input, "Please enter a valid non-negative integer for stock quantity.");
+                return false;
+            }
+
+            if (value > 10000) {
+                showError(input, "Stock quantity cannot exceed 10,000 units.");
+                return false;
+            }
+
+            return true;
+        }
+
+        function validateProductDescription() {
+            const input = document.getElementById("product_description");
+            const value = input.value.trim();
+            clearError(input);
+
+            if (value.length < 20 || value.length > 1000) {
+                showError(input, "Description must be between 20 and 1000 characters.");
+                return false;
+            }
+
+            return true;
+        }
+
+        function validateProductImage() {
+            const input = document.getElementById("product_image");
+            const file = input.files[0];
+            clearError(input);
+
+            if (!file) {
+                showError(input, "Please upload a product image.");
+                return false;
+            }
+
+            const allowedTypes = ["image/jpeg", "image/png"];
+            if (!allowedTypes.includes(file.type)) {
+                showError(input, "Only JPG and PNG files are allowed.");
+                return false;
+            }
+
+            if (file.size > 5 * 1024 * 1024) {
+                showError(input, "File size must be less than 5MB.");
+                return false;
+            }
+
+            return true;
+        }
+
+        // Attach event listeners to fields for real-time validation
+        document.getElementById("product_name").addEventListener("input", validateProductName);
+        document.getElementById("product_price_per_day").addEventListener("input", validateProductPrice);
+        document.getElementById("stock_quantity").addEventListener("input", validateStockQuantity);
+        document.getElementById("product_description").addEventListener("input", validateProductDescription);
+        document.getElementById("product_image").addEventListener("change", validateProductImage);
+
+        // Final validation before submitting the form
+        form.addEventListener("submit", function (e) {
+            if (
+                !validateProductName() ||
+                !validateProductPrice() ||
+                !validateStockQuantity() ||
+                !validateProductDescription() ||
+                !validateProductImage()
+            ) {
+                e.preventDefault(); // Prevent form submission if validation fails
+            }
+        });
+    });
+
+</script>
+
+</html>

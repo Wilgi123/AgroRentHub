@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ product.product_name }}</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/customer/style.css' %}">
+</head>
+<style>
+    .welcome-container {
+        position: relative;
+        width: 100%;
+        height: 200px;
+        overflow: hidden;
+    }
+
+    .welcome-message {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        color: white;
+        z-index: 1;
+        width: 80%;
+        max-width: 600px;
+    }
+
+    .welcome-message h1,
+    .welcome-message p {
+        font-family: 'Great Vibes', cursive;
+    }
+
+    .welcome-message h1 {
+        font-size: 3rem;
+        margin-bottom: 10px;
+        animation: textAnimation 2s ease-in-out;
+    }
+
+    .welcome-message p {
+        font-size: 1.5rem;
+        animation: textAnimation 1s ease-in-out;
+        color: white;
+    }
+
+    .welcome-message .moving-text {
+        white-space: nowrap;
+        display: inline-block;
+        animation: moveText 30s linear infinite;
+    }
+
+    @keyframes moveText {
+        0% {
+            transform: translateX(100%);
+        }
+
+        100% {
+            transform: translateX(-100%);
+        }
+    }
+
+    .welcome-container::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4));
+        z-index: 1;
+        pointer-events: none;
+    }
+
+    .welcome-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        z-index: 0;
+    }
+
+    /* Other styles remain the same */
+
+    .product-details-container {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-start;
+        /* Align items to the top */
+        margin: 20px auto;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        max-width: 90%;
+    }
+
+    .product-details-container img {
+        width: 350px;
+        /* Fixed width */
+        height: 350px;
+        /* Fixed height */
+        object-fit: cover;
+        /* Ensure the image covers the area, cropping as needed */
+        border-radius: 10px;
+        margin-right: 20px;
+    }
+
+    .product-details h1 {
+        margin-bottom: 10px;
+        /* Reduce space below the heading */
+    }
+
+    .product-details p {
+        margin: 5px 0;
+        /* Reduce vertical spacing between paragraphs */
+    }
+
+    .product-details p:first-of-type {
+        margin-top: 0;
+        /* Remove the top margin from the first paragraph */
+    }
+
+    .product-details {
+        padding: 20px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .product-details form {
+        margin-top: 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        /* Adjust spacing between fields and button */
+    }
+
+    .form-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        /* Adjust spacing between fields and button */
+        flex-wrap: wrap;
+        /* Allow items to wrap if needed */
+    }
+
+    .form-row label {
+        font-size: 1rem;
+        margin-right: 5px;
+    }
+
+    .form-row input {
+        padding: 8px;
+        font-size: 1rem;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
+    .form-row button {
+        padding: 10px 20px;
+        font-size: 1rem;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background 0.3s ease;
+        margin-left: 10px;
+        /* Space between fields and button */
+        display: inline-flex;
+        /* Ensure the button aligns with other inputs */
+        align-items: center;
+        justify-content: center;
+    }
+
+    .product-details .add-to-cart {
+        background: linear-gradient(135deg, #73eb44, #15c13a);
+        color: white;
+    }
+
+    .product-details .add-to-cart:hover {
+        background: linear-gradient(135deg, #01f82e, #e6ed1f);
+    }
+
+    .product-details .out-of-stock {
+        background: linear-gradient(135deg, #ff0000, #ffd700);
+        color: white;
+        cursor: not-allowed;
+    }
+</style>
+
+<body>
+    {% if request.session.user_id %}
+    <header>
+        <div class="logo">AgroRent</div>
+        <nav>
+            <ul>
+                <li><a href="{% url 'customer_index' %}">Home</a></li>
+                <li><a href="{% url 'customer_service' %}">Services</a></li>
+                <li><a href="{% url 'products' %}">Products</a></li>
+                <li><a href="{% url 'productcart' %}">Cart</a></li>
+                <li><a href="{% url 'orderdetails' %}">Orders</a></li>
+                <li><a href="{% url 'customer_profile' %}">Profile</a></li>
+                <li><a href="{% url 'logout' %}">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <div class="welcome-container">
+            <img class="welcome-image" src="{% static 'images/welcome.jpg' %}" alt="Welcome Image">
+            <div class="welcome-message">
+                <h1>{{ product.product_name }}</h1>
+                <p class="moving-text">Find the best agriculture tools and equipment for rent at AgroRent. </p>
+            </div>
+        </div>
+        <div class="product-details-container">
+            <img src="{{ product.product_image.url }}" alt="{{ product.product_name }}">
+            <div class="product-details">
+                <h1>{{ product.product_name }} <p>(Please order the product atleast 4 days before your requirement.)</p>
+                </h1>
+                <p><strong>Price:</strong> ₹{{ product.product_price_per_day }}</p>
+                <p><strong>Description:</strong> {{ product.product_description }}</p>
+                <p><strong>Supplier:</strong> {{ product.supplier.name }}</p>
+                <p><strong>Stock:</strong>
+                    {% if product.stock_quantity > 5 %}
+                    {{ product.stock_quantity }}
+                    {% else %}
+                    Out of Stock
+                    {% endif %}
+                </p>
+                <form method="post" action="{% url 'add_to_cart' product.id %}">
+                    {% csrf_token %}
+                    <div class="form-row">
+                        <label for="start_date">From:</label>
+                        <input type="date" id="start_date" name="start_date" required
+                            value="{{ cart_item.start_date|date:'Y-m-d' }}">
+                        <label for="end_date">To:</label>
+                        <input type="date" id="end_date" name="end_date" required
+                            value="{{ cart_item.end_date|date:'Y-m-d' }}">
+                        <label for="quantity">Quantity:</label>
+                        <input type="number" id="quantity" name="quantity" min="1" placeholder="1 to 5" max="5" required
+                            value="{{ cart_item.quantity|default:1 }}">
+                        {% if product.stock_quantity > 5 %}
+                        <button type="submit" class="add-to-cart">Add to Cart</button>
+                        {% else %}
+                        <button type="button" class="out-of-stock" disabled>Out of Stock</button>
+                        {% endif %}
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </main><br>
+    <footer class="footer">
+        <p>&copy; 2024 Agriculture Rental Hub. All rights reserved.</p>
+    </footer>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const today = new Date().toISOString().split('T')[0];
+            const startDateInputs = document.querySelectorAll('input[name="start_date"]');
+            const endDateInputs = document.querySelectorAll('input[name="end_date"]');
+
+            startDateInputs.forEach((startDateInput, index) => {
+                startDateInput.setAttribute('min', today);
+                startDateInput.addEventListener('change', function () {
+                    const selectedStartDate = new Date(this.value);
+                    const minEndDate = new Date(selectedStartDate);
+                    minEndDate.setDate(minEndDate.getDate() + 1); // At least 1 day after start date
+                    const minEndDateStr = minEndDate.toISOString().split('T')[0];
+                    endDateInputs[index].setAttribute('min', minEndDateStr);
+                });
+            });
+
+            endDateInputs.forEach((endDateInput, index) => {
+                endDateInput.setAttribute('min', today);
+                endDateInput.addEventListener('change', function () {
+                    const selectedStartDate = new Date(startDateInputs[index].value);
+                    const selectedEndDate = new Date(this.value);
+                    if (selectedEndDate <= selectedStartDate) {
+                        alert("End date must be after start date.");
+                        this.value = "";
+                    }
+                });
+            });
+        });
+
+        filterSelection("all")
+        function filterSelection(category) {
+            var items, i;
+            items = document.getElementsByClassName("filterDiv");
+            if (category == "all") category = "";
+            for (i = 0; i < items.length; i++) {
+                w3RemoveClass(items[i], "show");
+                if (items[i].className.indexOf(category) > -1) w3AddClass(items[i], "show");
+            }
+        }
+
+        function filterProducts() {
+            var input, filter, rentalItems, items, title;
+            input = document.getElementById('searchInput');
+            filter = input.value.toUpperCase();
+            rentalItems = document.getElementById("rentalItemsContainer");
+            items = rentalItems.getElementsByClassName('rental-item');
+
+            for (var i = 0; i < items.length; i++) {
+                title = items[i].getElementsByTagName("h3")[0];
+                if (title.innerText.toUpperCase().indexOf(filter) > -1) {
+                    items[i].style.display = "";
+                } else {
+                    items[i].style.display = "none";
+                }
+            }
+        }
+
+        function w3AddClass(element, name) {
+            var i, arr1, arr2;
+            arr1 = element.className.split(" ");
+            arr2 = name.split(" ");
+            for (i = 0; i < arr2.length; i++) {
+                if (arr1.indexOf(arr2[i]) == -1) { element.className += " " + arr2[i]; }
+            }
+        }
+
+        function w3RemoveClass(element, name) {
+            var i, arr1, arr2;
+            arr1 = element.className.split(" ");
+            arr2 = name.split(" ");
+            for (i = 0; i < arr2.length; i++) {
+                while (arr1.indexOf(arr2[i]) > -1) {
+                    arr1.splice(arr1.indexOf(arr2[i]), 1);
+                }
+            }
+            element.className = arr1.join(" ");
+        }
+
+        // Add active class to the current button (highlight it)
+        var btnContainer = document.getElementById("myBtnContainer");
+        var btns = btnContainer.getElementsByClassName("btn");
+        for (var i = 0; i < btns.length; i++) {
+            btns[i].addEventListener("click", function () {
+                var current = document.getElementsByClassName("active");
+                current[0].className = current[0].className.replace(" active", "");
+                this.className += " active";
+            });
+        }
+
+        function showDetails(productId) {
+            window.location.href = `/product/${productId}/`;
+        }
+
+        let sortOrder = true; // true for ascending, false for descending
+        let sortBy = 'name'; // default sort by name
+
+        function sortProducts() {
+            const container = document.getElementById('rentalItemsContainer');
+            const items = Array.from(container.getElementsByClassName('rental-item'));
+
+            items.sort((a, b) => {
+                let valueA, valueB;
+
+                if (sortBy === 'price') {
+                    valueA = parseFloat(a.querySelector('p').innerText.replace('₹', ''));
+                    valueB = parseFloat(b.querySelector('p').innerText.replace('₹', ''));
+                } else if (sortBy === 'name') {
+                    valueA = a.querySelector('h3').innerText.toUpperCase();
+                    valueB = b.querySelector('h3').innerText.toUpperCase();
+                }
+
+                if (sortOrder) {
+                    return valueA > valueB ? 1 : -1;
+                } else {
+                    return valueA < valueB ? 1 : -1;
+                }
+            });
+
+            container.innerHTML = '';
+            items.forEach(item => container.appendChild(item));
+        }
+
+        document.getElementById('sortByName').addEventListener('click', () => {
+            sortBy = 'name';
+            sortOrder = !sortOrder;
+            sortProducts();
+        });
+
+        document.getElementById('sortByPrice').addEventListener('click', () => {
+            sortBy = 'price';
+            sortOrder = !sortOrder;
+            sortProducts();
+        });
+    </script>
+
+    {% else %}
+    <p>Access Denied</p>
+    {% endif %}
+</body>
+
+
+</html>

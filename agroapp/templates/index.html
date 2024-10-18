@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgroRent Hub</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <div class="full-page">
+        <div class="navbar">
+            <div>
+                <a href="{% url 'index' %}">AgroRent Hub</a>
+            </div>
+            <nav>
+                <ul id="MenuItems">
+                    <li><a href="{% url 'index' %}">Home</a></li>
+                    <li><a href="{% url 'about_us' %}">About Us</a></li>
+                    <li><a href="{% url 'services' %}">Services</a></li>
+                    <li><a href="{% url 'rental_items' %}">Products</a></li>
+                    <li><a href="{% url 'contact' %}">Contact</a></li>
+                    <li><a href="{% url 'login' %}">Login</a></li>
+                    <li><a href="{% url 'register' %}">Register</a></li>
+                </ul>
+            </nav>
+        </div>
+        <div class="homepage-section">
+            <h1>Welcome to AgroRent Hub</h1>
+            <div class="information">
+                <p>AgroRent Hub is your premier destination for agricultural rentals. Whether you need equipment, products, or services, we've got you covered. Our platform connects farmers with suppliers seamlessly, ensuring you get what you need, when you need it.</p>
+            </div>
+            <div class="buttons">
+                <a href="{% url 'login' %}">Explore Rentals</a>
+                <a href="{% url 'login' %}">Become a Supplier</a>
+            </div>
+        </div>
+    </div>
+    <div class="footer">
+        <div class="footer-content">
+        <p>&copy; 2024 AgroRent Hub. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

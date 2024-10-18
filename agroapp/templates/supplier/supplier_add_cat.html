@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Product Category</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/supplier/style.css' %}">
+    <script src="{% static 'js/supplier/script.js' %}" defer></script>
+</head>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f4;
+    }
+    .logo {
+        font-size: 24px;
+        font-weight: bold;
+    }
+    .navbar, .sidebar, .main, footer {
+        padding: 10px;
+    }
+    .navbar {
+        background-color: #4CAF50;
+        color: white;
+    }
+  
+    .sidebar a {
+        display: block;
+        color: white;
+        padding: 15px;
+        text-decoration: none;
+    }
+    .sidebar a:hover {
+        background-color: #575757;
+    }
+    .main {
+        margin-left: 220px;
+        padding: 20px;
+        min-height: calc(100vh - 60px); /* Adjusted to account for header height */
+    }
+    .error-message {
+        color: red;
+        font-size: 0.9em;
+        display: none;
+    }
+</style>
+<body>
+    {% if request.session.user_id %}
+    <header>
+        <div class="logo">AgroRent Supplier Panel</div>
+        <nav>
+            <ul>
+                <li><a href="{% url 'supplier_profile' %}">Profile</a></li>
+                <li><a href="{% url 'logout' %}">SignOut</a></li>
+            </ul>
+        </nav>
+    </header>
+    <div class="sidebar">
+        <a href="{% url 'supplier_index' %}" data-page="supplier_index">Dashboard</a>
+        <a href="{% url 'supplier_add_pro' %}" data-page="supplier_add_pro">Add Rental Products</a>
+        <a href="{% url 'supplier_view_pro' %}" data-page="supplier_view_pro">View Rental Products</a>
+        <a href="{% url 'supplier_add_cat' %}" data-page="supplier_add_cat">Add Categories</a>
+        <a href="{% url 'supplier_view_cat' %}" data-page="supplier_view_cat">View Categories</a>
+        <a href="{% url 'add_product_damage' %}" data-page="supplier_add_pro">Add Cost For Damaged Product</a>
+        <a href="{% url 'view_product_damage' %}" data-page="supplier_add_pro">View Cost For Damaged Product</a>
+        <a href="{% url 'supplier_view_order' %}" data-page="supplier_view_order">View Orders</a>
+    </div>
+    <div class="main" id="main-content">
+        <h2>Add Product Category</h2>
+        <form id="categoryForm" action="{% url 'supplier_add_cat' %}" method="post">
+            {% csrf_token %}
+            <label for="name">Category Name:</label>
+            <input type="text" id="name" name="name" required>
+            <div id="name-error" class="error-message">Category name already exists.</div>
+            <div id="invalid-error" class="error-message">Please avoid using special characters or numbers.</div>
+            <br><br>
+            <button type="submit">Add Category</button>
+        </form>
+    </div>
+    <footer>
+        <p>&copy; 2024 Agriculture Rental Hub. All rights reserved.</p>
+    </footer>
+    {% else %}
+    <p>Access Denied</p>
+    {% endif %}
+</body>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const categoryForm = document.getElementById('categoryForm');
+        const nameInput = document.getElementById('name');
+        const nameError = document.getElementById('name-error');
+        const invalidError = document.getElementById('invalid-error');
+        const existingCategories = {{ categories|safe }}; // Get existing categories from the view
+
+        nameInput.addEventListener('input', function() {
+            const nameValue = nameInput.value.trim();
+            const regex = /^[a-zA-Z\s]+$/; // Regex to allow only letters and spaces
+            let hasError = false;
+
+            // Reset error messages
+            nameError.style.display = 'none';
+            invalidError.style.display = 'none';
+
+            // Check if the name is already in the list of existing categories
+            if (existingCategories.includes(nameValue)) {
+                nameError.style.display = 'block';
+                hasError = true;
+            }
+
+            // Check for invalid characters
+            if (!regex.test(nameValue)) {
+                invalidError.style.display = 'block';
+                hasError = true;
+            }
+
+            // Prevent form submission if there's an error
+            if (hasError) {
+                categoryForm.querySelector('button[type="submit"]').disabled = true;
+            } else {
+                categoryForm.querySelector('button[type="submit"]').disabled = false;
+            }
+        });
+
+        categoryForm.addEventListener('submit', function(event) {
+            const nameValue = nameInput.value.trim();
+            const regex = /^[a-zA-Z\s]+$/;
+
+            // Prevent form submission if there are errors
+            if (existingCategories.includes(nameValue) || !regex.test(nameValue)) {
+                event.preventDefault();
+            }
+        });
+    });
+</script>
+</html>

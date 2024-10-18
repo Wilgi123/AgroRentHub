@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delivery Boy Dashboard - AgroRent Hub</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/deliveryboy/style.css' %}">
+    <script src="{% static 'js/deliveryboy/script.js' %}" defer></script>
+    <style>
+        /* Table container */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        /* Header styling */
+        table thead {
+            background-color: #4CAF50;
+            color: white;
+            text-align: center;
+        }
+
+        /* Header cells styling */
+        table th {
+            padding: 12px 15px;
+            font-weight: bold;
+        }
+
+        /* Body cells styling */
+        table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #ddd;
+            text-align: center;
+        }
+
+        /* Zebra striping for rows */
+        table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+
+
+        /* First column styling */
+        table td:first-child {
+            font-weight: bold;
+            color: #333;
+        }
+
+        /* Price column styling */
+        table td:last-child {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+
+        /* Responsive design: table wrapping */
+        @media (max-width: 768px) {
+            table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+        }
+
+        .modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        .modal input {
+            margin-bottom: 10px;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: calc(100% - 20px);
+        }
+
+        .modal button {
+            padding: 8px 12px;
+            margin: 5px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .modal #verify-otp-button {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .modal #cancel-otp-button {
+            background-color: #f44336;
+            color: white;
+        }
+
+        #otpModal {
+            display: none;
+        }
+
+        /* Ship Product Button styling */
+        .ship-button {
+            background-color: #2196F3;
+            /* Blue color */
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .ship-button:hover {
+            background-color: #1E88E5;
+            /* Darker blue on hover */
+        }
+
+        /* Delivered Button styling */
+        .delivered-button {
+            background-color: #4CAF50;
+            /* Green color */
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            /* Indicates that the button is not clickable */
+            border-radius: 5px;
+        }
+
+        .delivered-button:hover {
+            background-color: #388E3C;
+            /* Darker green on hover */
+        }
+
+        .return-button {
+            background-color: #FF9800;
+            /* Orange color */
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .return-button:hover {
+            background-color: #FB8C00;
+            /* Darker orange on hover */
+        }
+
+        /* Defect Modal styling */
+        .defect-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            display: none;
+        }
+
+        .defect-modal input,
+        .defect-modal textarea {
+            margin-bottom: 10px;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: calc(100% - 20px);
+        }
+
+        .defect-modal button {
+            padding: 8px 12px;
+            margin: 5px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .defect-modal #submit-defect-button {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .defect-modal #cancel-defect-button {
+            background-color: #f44336;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    {% if request.session.user_id %}
+    <header>
+        <div class="logo">AgroRent DeliveryBoy Panel</div>
+        <nav>
+            <ul>
+                <a href="{% url 'deliveryboy_profile' %}" class="button profile">Profile</a>
+                <a href="{% url 'logout' %}" class="button logout">Sign Out</a>
+            </ul>
+        </nav>
+    </header>
+    <div class="container">
+        <div class="sidebar">
+            <nav>
+                <ul>
+                    <li><a href="{% url 'deliveryboy_index' %}" data-page="deliveryboy_index">Dashboard</a></li>
+                    <li><a href="{% url 'deliveryboy_view_order' %}" data-page="deliveryboy_view_order">View Orders</a>
+                    </li>
+                    <li><a href="{% url 'deliveryboy_deliveries' %}" data-page="deliveryboy_deliveries">My
+                            Deliveries</a></li>
+                    <li><a href="{% url 'deliveryboy_earnings' %}" data-page="deliveryboy_earnings">Earnings</a></li>
+                    <li><a href="{% url 'deliveryboy_support' %}" data-page="deliveryboy_support">Support</a></li>
+                </ul>
+            </nav>
+        </div>
+        <div class="main">
+            <h2>Defect and Dispute Form</h2>
+            <form method="post">
+                {% csrf_token %}
+                <p>Customer: {{ order.user.name }}</p>
+                <p>Product: {{ order.product.product_name }}</p>
+                <p>Supplier: {{ order.product.supplier.name }}</p>
+                <p>Quantity: {{ order.quantity }}</p>
+                <p>Start Date: {{ order.start_date }}</p>
+                <p>End Date: {{ order.end_date }}</p>
+                <p>Price: ₹{{ order.price }}</p>
+        
+                <label for="defect_description">Defect Description:</label>
+                <textarea id="defect_description" name="defect_description" required></textarea>
+                
+                <label for="payment_for_defect">Payment for Defect:</label>
+                <input type="number" id="payment_for_defect" name="payment_for_defect" step="0.01" required>
+                
+                <label for="dispute_description">Dispute Description (Optional):</label>
+                <textarea id="dispute_description" name="dispute_description"></textarea>
+                
+                <button type="submit">Submit</button>
+            </form>
+        </div>
+    </div>
+    <br>
+    <footer class="footer">
+        <p>&copy; 2024 AgroRent Hub. All rights reserved.</p>
+    </footer>
+    
+    {% else %}
+    <div class="container">
+        <p>Access Denied</p>
+    </div>
+    {% endif %}
+</body>
+
+
+</html>

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify OTP - AgroRent Hub</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <div class="full-page">
+        <div class="navbar">
+            <div>
+                <a href="{% url 'index' %}">AgroRent Hub</a>
+            </div>
+            <nav>
+                <ul id="MenuItems">
+                    <li><a href="{% url 'index' %}">Home</a></li>
+                    <li><a href="{% url 'about_us' %}">About Us</a></li>
+                    <li><a href="{% url 'services' %}">Services</a></li>
+                    <li><a href="{% url 'rental_items' %}">Products</a></li>
+                    <li><a href="{% url 'contact' %}">Contact</a></li>
+                    <li><a href="{% url 'login' %}">Login</a></li>
+                    <li><a href="{% url 'register' %}">Register</a></li>
+                </ul>
+            </nav>
+        </div>
+        <div class="content-section">
+            <div class="form-box-verify-otp">
+                <form class="input-group-verify-otp" method="post" action="{% url 'verify_otp' %}">
+                    {% csrf_token %}
+                    <h1 style="color: white; text-align: center; margin-top: 0;">Verify OTP</h1>
+                    {% if messages %}
+                        <p style="color: red; font-weight: 800; text-align: center;">
+                            {% for message in messages %}
+                                {{ message }}
+                            {% endfor %}
+                        </p>
+                    {% endif %}
+                    <input type="text" class="input-field" name="otp" placeholder="Enter OTP" required><br><br>
+                    <button type="submit" class="submit-btn">Verify OTP</button><br>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

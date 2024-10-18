@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Services</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/customer/style.css' %}">
+    <script src="{% static 'js/customer/script.js' %}" defer></script>
+    <style>
+        .welcome-container {
+            position: relative;
+            width: 100%;
+            height: 200px;
+            overflow: hidden;
+        }
+
+        .welcome-message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: white;
+            z-index: 1;
+            width: 80%;
+            max-width: 600px;
+        }
+
+        .welcome-message h1,
+        .welcome-message p {
+            font-family: 'Great Vibes', cursive;
+        }
+
+        .welcome-message h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            animation: textAnimation 2s ease-in-out;
+        }
+
+        .welcome-message p {
+            font-size: 1.2rem;
+            animation: textAnimation 3s ease-in-out;
+        }
+
+        .welcome-container::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4));
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .welcome-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 0;
+        }
+
+        body {
+            font-family: "Lato", sans-serif;
+            margin: 0;
+        }
+
+        .service-item img {
+        width: 100%;
+        height: 250px;
+        border-radius: 10px;
+        margin-bottom: 10px;
+        transition: opacity 0.3s ease;
+    }
+    .services-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+
+    .service-item {
+        flex: 1 1 calc(29.333% - 20px);
+        max-width: calc(29.30% - 10px);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        background-color: rgba(0, 0, 0, 0.5);
+        text-align: center;
+        padding: 20px;
+        transition: transform 0.3s;
+        position: relative;
+    }
+
+    .service-item:hover {
+        transform: translateY(-5px);
+    }
+
+    .service-item h2 {
+        font-size: 1.5rem;
+    }
+
+    .service-item p {
+        font-size: 1rem;
+        color: #ffffff;
+        padding: 1px;
+        text-align: center;
+    }        .service-link {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            text-decoration: none;
+            color: inherit;
+        }
+    </style>
+</head>
+
+<body>
+    {% if request.session.user_id %}
+    <header>
+        <div class="logo">AgroRent</div>
+        <nav>
+            <ul>
+                <li><a href="{% url 'customer_index' %}">Home</a></li>
+                <li><a href="{% url 'customer_service' %}">Services</a></li>
+                <li><a href="{% url 'products' %}">Products</a></li>
+                <li><a href="{% url 'productcart' %}">Cart</a></li>
+                <li><a href="{% url 'orderdetails' %}">Orders</a></li>
+                <li><a href="{% url 'customer_profile' %}">Profile</a></li>
+                <li><a href="{% url 'logout' %}">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <section class="content">
+            <div class="welcome-container">
+                <img class="welcome-image" src="{% static 'images/welcome.jpg' %}" alt="Welcome Image">
+                <div class="welcome-message">
+                    <h1>Our Services</h1>
+                </div>
+            </div>
+            <div class="content-section">
+                <div class="services-grid">
+                    <div class="service-item">
+                        <a href="{% url 'products' %}" class="service-link"></a>
+                        <img src="{% static 'images/machinery.jpg' %}" alt="Machinery">
+                        <h2>Machinery and Equipment</h2>
+                        <p>Explore our range of machinery and equipment for efficient farm operations.</p>
+                    </div>
+                    <div class="service-item">
+                        <a href="{% url 'products' %}" class="service-link"></a>
+                        <img src="{% static 'images/tools.jpg' %}" alt="Tools">
+                        <h2>Tools</h2>
+                        <p>Discover specialized tools to enhance your agricultural tasks.</p>
+                    </div>
+                    <div class="service-item">
+                        <a href="{% url 'products' %}" class="service-link"></a>
+                        <img src="{% static 'images/irrigation.jpg' %}" alt="Irrigation Equipment">
+                        <h2>Irrigation Equipment</h2>
+                        <p>Efficient irrigation systems tailored to your crop and soil requirements.</p>
+                    </div>
+                    <div class="service-item">
+                        <a href="{% url 'products' %}" class="service-link"></a>
+                        <img src="{% static 'images/harvesting.jpg' %}" alt="Harvesting Equipment">
+                        <h2>Harvesting Equipment</h2>
+                        <p>Advanced harvesting tools to maximize yield during harvest seasons.</p>
+                    </div>
+                    <div class="service-item">
+                        <a href="{% url 'products' %}" class="service-link"></a>
+                        <img src="{% static 'images/transport.jpg' %}" alt="Transport Vehicles">
+                        <h2>Transport Vehicles</h2>
+                        <p>Reliable transport vehicles to move goods and equipment across your farm.</p>
+                    </div>
+                    <div class="service-item">
+                        <a href="{% url 'products' %}" class="service-link"></a>
+                        <img src="{% static 'images/livestock.jpg' %}" alt="Livestock Equipment">
+                        <h2>Livestock Equipment</h2>
+                        <p>Equipment and tools for efficient livestock management and care.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    <footer class="footer">
+        <p>&copy; 2024 Agriculture Rental Hub. All rights reserved.</p>
+    </footer>
+    <script src="{% static 'scripts.js' %}"></script>
+    {% else %}
+    <p>Access Denied</p>
+    {% endif %}
+</body>
+
+</html>

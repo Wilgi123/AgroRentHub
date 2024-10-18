@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delivery Boy Dashboard - AgroRent Hub</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/deliveryboy/style.css' %}">
+    <script src="{% static 'js/deliveryboy/script.js' %}" defer></script>
+</head>
+<style>
+    button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    margin-right: 10px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+    .form-container {
+        background-color: #f9f9f9;
+        padding: 10px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+    }
+    
+    form input[type="text"],
+    form input[type="password"] {
+        width: 100%;
+        padding: 10px;
+        margin: 10px 0;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+    }
+    
+    form input[type="submit"] {
+        width: 100%;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        padding: 15px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background-color 0.3s ease;
+    }
+    
+    form input[type="submit"]:hover {
+        background-color: #45a049;
+    }
+    
+    .error {
+        color: red;
+        font-size: 0.9em;
+        margin-top: -10px;
+        padding: 5px;
+    }
+    
+   </style>
+<body>
+    {% if request.session.user_id %}
+    <header>
+        <div class="logo">AgroRent DeliveryBoy Panel</div>
+        <nav>
+            <ul>
+                <a href="{% url 'deliveryboy_profile' %}" class="button profile">Profile</a>
+                <a href="{% url 'logout' %}" class="button logout">Sign Out</a>
+                
+            </ul>
+        </nav>
+    </header>
+    <div class="container">
+        <div class="sidebar">
+            <nav>
+                <ul>
+                    <li><a href="{% url 'deliveryboy_index' %}" data-page="deliveryboy_index">Dashboard</a></li>
+                    <li><a href="{% url 'deliveryboy_view_order' %}" data-page="deliveryboy_view_order">View Orders</a></li>
+                    <li><a href="{% url 'deliveryboy_return_management' %}" data-page="deliveryboy_return_management">Return Management</a></li> <!-- New Section -->
+                    <!--<li><a href="{% url 'deliveryboy_view_damages' %}" data-page="deliveryboy_view_damages">View Damaged Products</a></li>-->
+                    <li><a href="{% url 'deliveryboy_view_damages_chart' %}" data-page="deliveryboy_view_damages_chart">Repair Cost Details</a></li>
+
+                    <li><a href="{% url 'deliveryboy_deliveries' %}" data-page="deliveryboy_deliveries">My Deliveries</a></li>
+                    <li><a href="{% url 'deliveryboy_earnings' %}" data-page="deliveryboy_earnings">Earnings</a></li>
+                    <li><a href="{% url 'deliveryboy_support' %}" data-page="deliveryboy_support">Support</a></li>
+                </ul>
+            </nav>
+        </div>
+        <div class="main">
+            <h2>Delivery Boy Profile</h2>
+            <div class="content">
+                <h3>Name: {{ deliveryboy.name }}</h3>
+                <p>Email: {{ deliveryboy.email }}</p>
+                <p>Address: {{ deliveryboy.address }}</p>
+                <p>Phone: {{ deliveryboy.phone }}</p>
+            </div><br>
+            <div class="buttons">
+                <button id="edit-details-button">Edit Details</button>
+                <button id="change-password-button">Change Password</button>
+            </div><br>
+            <div id="edit-details-form" class="form-container" style="display:none;">
+                <h3>Edit Details</h3>
+                <form method="POST" action="{% url 'deliveryboy_edit_details' %}" id="editDetailsForm">
+                    {% csrf_token %}
+                    <input type="text" id="name" name="name" value="{{ deliveryboy.name }}" required>
+                    <p id="nameError" class="error"></p>
+                    <input type="text" id="address" name="address" value="{{ deliveryboy.address }}" required>
+                    <p id="addressError" class="error"></p>
+                    <input type="text" id="phone" name="phone" value="{{ deliveryboy.phone }}" required>
+                    <p id="phoneError" class="error"></p>
+                    <input type="submit" value="Update">
+                </form>
+            </div>
+            <div id="change-password-form" class="form-container" style="display:none;">
+                <h3>Change Password</h3>
+                <form id="changePasswordForm" method="POST" action="{% url 'deliveryboy_change_password' %}">
+                    {% csrf_token %}
+                    <input type="password" id="current-password" name="current-password" placeholder="Current Password" required>
+                    <p id="currentPasswordError" class="error"></p>
+                    <input type="password" id="password" name="password" placeholder="New Password" required>
+                    <p id="passwordError" class="error"></p>
+                    <input type="password" id="confirmPassword" name="confirm_password" placeholder="Confirm Password" required>
+                    <p id="confirmPasswordError" class="error"></p><br>
+                    <input type="submit" value="Change Password">
+                </form>
+            </div>
+        </div>
+    </div><br>
+    <footer class="footer">
+        <p>&copy; 2024 AgroRent Hub. All rights reserved.</p>
+    </footer>
+    {% else %}
+    <div class="container">
+        <p>Access Denied</p>
+    </div>
+    {% endif %}
+</body>
+</html>

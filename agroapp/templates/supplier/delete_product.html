@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delete Product</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/supplier/style.css' %}">
+    <script src="{% static 'js/supplier/script.js' %}" defer></script>
+</head>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f4;
+    }
+    .logo {
+        font-size: 24px;
+        font-weight: bold;
+    }
+    .navbar, .sidebar, .main, footer {
+        padding: 10px;
+    }
+    .navbar {
+        background-color: #4CAF50;
+        color: white;
+    }
+  
+    .sidebar a {
+        display: block;
+        color: white;
+        padding: 15px;
+        text-decoration: none;
+    }
+    .sidebar a:hover {
+        background-color: #575757;
+    }
+    .main {
+        margin-left: 220px;
+        padding: 20px;
+        min-height: calc(100vh - 60px); /* Adjusted to account for header height */
+    }
+    .stats {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+    .stat-box {
+        background-color: white;
+        padding: 20px;
+        border-radius: 10px;
+        flex: 1 1 calc(33.333% - 40px);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .stat-box .icon {
+        font-size: 2rem;
+        color: #4CAF50;
+    }
+    .stat-box .details {
+        text-align: right;
+    }
+    .stat-box .details h3 {
+        margin: 0;
+        font-size: 1.5rem;
+    }
+    .stat-box .details p {
+        margin: 0;
+        color: #777;
+    }
+</style>
+<body>
+    <header>
+        <div class="logo">AgroRent Supplier Panel</div>
+        <nav>
+            <ul>
+                <li><a href="{% url 'supplier_profile' %}">Profile</a></li>
+                <li><a href="{% url 'logout' %}">SignOut</a></li>
+            </ul>
+        </nav>
+    </header>
+    <div class="main" id="main-content">
+        <h2>Delete Product</h2>
+        <p>Are you sure you want to delete "{{ product.product_name }}"?</p>
+        <form action="" method="post">
+            {% csrf_token %}
+            <button type="submit">Confirm Delete</button>
+            <a href="{% url 'supplier_view_pro' %}">Cancel</a>
+        </form>
+    </div>
+    <footer>
+        <p>&copy; 2024 Agriculture Rental Hub. All rights reserved.</p>
+    </footer>
+</body>
+</html>

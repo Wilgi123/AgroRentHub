@@ -1,0 +1,194 @@
+<!-- view_categories.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Product Category</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/supplier/style.css' %}">
+    <script src="{% static 'js/supplier/script.js' %}" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    
+</head>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f4;
+    }
+    .logo {
+        font-size: 24px;
+        font-weight: bold;
+    }
+    .navbar, .sidebar, .main, footer {
+        padding: 10px;
+    }
+    .navbar {
+        background-color: #4CAF50;
+        color: white;
+    }
+
+    .sidebar a {
+        display: block;
+        color: white;
+        padding: 15px;
+        text-decoration: none;
+    }
+    .sidebar a:hover {
+        background-color: #575757;
+    }
+    .main {
+        margin-left: 220px;
+        padding: 20px;
+        min-height: calc(100vh - 60px); /* Adjusted to account for header height */
+    }
+    .stats {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+    .stat-box {
+        background-color: white;
+        padding: 20px;
+        border-radius: 10px;
+        flex: 1 1 calc(33.333% - 40px);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .stat-box .icon {
+        font-size: 2rem;
+        color: #4CAF50;
+    }
+    .stat-box .details {
+        text-align: right;
+    }
+    .stat-box .details h3 {
+        margin: 0;
+        font-size: 1.5rem;
+    }
+    .stat-box .details p {
+        margin: 0;
+        color: #777;
+    }
+</style>
+<body>
+    {% if request.session.user_id %}
+    <header>
+        <div class="logo">AgroRent Supplier Panel</div>
+        <nav>
+            <ul>
+                <li><a href="{% url 'supplier_profile' %}">Profile</a></li>
+                <li><a href="{% url 'logout' %}">SignOut</a></li>
+            </ul>
+        </nav>
+    </header>
+    <div class="sidebar">
+        <a href="{% url 'supplier_index' %}" data-page="supplier_index">Dashboard</a>
+        <a href="{% url 'supplier_add_pro' %}" data-page="supplier_add_pro">Add Rental Products</a>
+        <a href="{% url 'supplier_view_pro' %}" data-page="supplier_view_pro">View Rental Products</a>
+        <a href="{% url 'supplier_add_cat' %}" data-page="supplier_add_cat">Add Categories</a>
+        <a href="{% url 'supplier_view_cat' %}" data-page="supplier_view_cat">View Categories</a>
+        <a href="{% url 'add_product_damage' %}" data-page="supplier_add_pro">Add Cost For Damaged Product</a>
+        <a href="{% url 'view_product_damage' %}" data-page="supplier_add_pro">View Cost For Damaged Product</a>
+        <a href="{% url 'supplier_view_order' %}" data-page="supplier_view_order">View Orders</a>
+      <!--<a href="{% url 'supplier_add_del' %}" data-page="supplier_add_del">ADD DELIVERYBOY</a>
+        <a href="{% url 'supplier_view_del' %}" data-page="supplier_view_del">VIEW DELIVERY BOY</a>
+        <a href="{% url 'supplier_add_worker' %}" data-page="supplier_add_worker">ADD WORKERS</a>
+        <a href="{% url 'supplier_view_worker' %}" data-page="supplier_view_worker">VIEW WORKERS</a>
+        <a href="{% url 'supplier_view_order' %}" data-page="supplier_view_order">VIEW ORDERS</a>-->
+    </div>
+    <div class="main" id="main-content">
+        <h2>View Product Categories</h2>
+        <!-- Table to display categories -->
+        <table>
+            <thead>
+                <tr>
+                    <th>Si.No</th>
+                    <th>Category Name</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for category in categories %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ category.name }}</td>
+                    <td class="actions">
+                        <a href="{% url 'update_category' category.id %}" class="button">Update</a>
+                        <a href="#" class="button delete" data-id="{{ category.id }}">Delete</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <footer>
+        <p>&copy; 2024 Agriculture Rental Hub. All rights reserved.</p>
+    </footer>
+    {% else %}
+    <p>Access Denied</p>
+    {% endif %}
+</body>
+<script>
+    $(document).ready(function() {
+    $('.delete').on('click', function(e) {
+        e.preventDefault();  // Prevent the default action (following the link)
+
+        const categoryId = $(this).data('id');  // Get the category ID from data attribute
+
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // AJAX request to delete the category
+                $.ajax({
+                    url: `{% url 'delete_category' 0 %}`.replace('0', categoryId),
+                    method: 'POST',
+                    data: {
+                        csrfmiddlewaretoken: '{{ csrf_token }}'
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            Swal.fire(
+                                'Deleted!',
+                                'The category has been deleted.',
+                                'success'
+                            ).then(() => {
+                                // Reload the page or update the table via JavaScript
+                                location.reload();
+                            });
+                        } else {
+                            Swal.fire(
+                                'Error!',
+                                'There was a problem deleting the category.',
+                                'error'
+                            );
+                        }
+                    },
+                    error: function() {
+                        Swal.fire(
+                            'Error!',
+                            'There was a problem deleting the category.',
+                            'error'
+                        );
+                    }
+                });
+            }
+        });
+    });
+});
+
+</script>
+</html>

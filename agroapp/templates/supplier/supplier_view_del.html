@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Delivery Boy Details</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/supplier/style.css' %}">
+    <script src="{% static 'js/supplier/script.js' %}" defer></script>
+</head>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f4;
+    }
+    .logo {
+        font-size: 24px;
+        font-weight: bold;
+    }
+    .navbar, .sidebar, .main, footer {
+        padding: 10px;
+    }
+    .navbar {
+        background-color: #4CAF50;
+        color: white;
+    }
+
+    .sidebar a {
+        display: block;
+        color: white;
+        padding: 15px;
+        text-decoration: none;
+    }
+    .sidebar a:hover {
+        background-color: #575757;
+    }
+    .main {
+        margin-left: 220px;
+        padding: 20px;
+        min-height: calc(100vh - 60px); /* Adjusted to account for header height */
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    table th, table td {
+        padding: 10px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+    table th {
+        background-color: #4CAF50;
+        color: white;
+    }
+    table tr:hover {
+        background-color: #f5f5f5;
+    }
+    table a {
+        color: #4CAF50;
+        text-decoration: none;
+    }
+    table a:hover {
+        text-decoration: underline;
+    }
+</style>
+<body>
+    {% if request.session.user_id %}
+    <header>
+        <div class="logo">AgroRent Supplier Panel</div>
+        <nav>
+            <ul>
+                <li><a href="{% url 'supplier_profile' %}">Profile</a></li>
+                <li><a href="{% url 'logout' %}">SignOut</a></li>
+            </ul>
+        </nav>
+    </header>
+    <div class="sidebar">
+        <a href="{% url 'supplier_index' %}" data-page="supplier_index">Dashboard</a>
+        <a href="{% url 'supplier_add_pro' %}" data-page="supplier_add_pro">Add Rental Products</a>
+        <a href="{% url 'supplier_view_pro' %}" data-page="supplier_view_pro">View Rental Products</a>
+        <a href="{% url 'supplier_add_cat' %}" data-page="supplier_add_cat">Add Categories</a>
+        <a href="{% url 'supplier_view_cat' %}" data-page="supplier_view_cat">View Categories</a>
+        <a href="{% url 'add_product_damage' %}" data-page="supplier_add_pro">Add Cost For Damaged Product</a>
+        <a href="{% url 'view_product_damage' %}" data-page="supplier_add_pro">View Cost For Damaged Product</a>
+        <a href="{% url 'supplier_view_order' %}" data-page="supplier_view_order">View Orders</a>
+        <!--<a href="{% url 'supplier_add_del' %}" data-page="supplier_add_del">ADD DELIVERYBOY</a>
+        <a href="{% url 'supplier_view_del' %}" data-page="supplier_view_del">VIEW DELIVERY BOY</a>
+        <a href="{% url 'supplier_add_worker' %}" data-page="supplier_add_worker">ADD WORKERS</a>
+        <a href="{% url 'supplier_view_worker' %}" data-page="supplier_view_worker">VIEW WORKERS</a>
+        <a href="{% url 'supplier_view_order' %}" data-page="supplier_view_order">VIEW ORDERS</a>-->
+    </div>
+    <div class="main" id="main-content">
+        <h2>View Delivery Boy Details</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Si.No</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for delivery_boy in delivery_boys %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ delivery_boy.name }}</td>
+                    <td>{{ delivery_boy.email }}</td>
+                    <td>{{ delivery_boy.phone }}</td>
+                    <td>
+                        <a href="{% url 'delete_delivery_boy' delivery_boy.id %}" onclick="return confirm('Are you sure you want to delete this delivery boy?');">Delete</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div><br><br>
+    <footer>
+        <p>&copy; 2024 Agriculture Rental Hub. All rights reserved.</p>
+    </footer>
+    {% else %}
+    <p>Access Denied</p>
+    {% endif %}
+</body>
+</html>

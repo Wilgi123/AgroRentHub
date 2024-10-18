@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product View</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/customer/style.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    <script src="{% static 'js/customer/script.js' %}" defer></script>
+  <style>
+        .welcome-container {
+            position: relative;
+            width: 100%;
+            height: 200px;
+            overflow: hidden;
+        }
+
+        .welcome-message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: white;
+            z-index: 1;
+            width: 80%;
+            max-width: 600px;
+        }
+
+        .welcome-message h1,
+        .welcome-message p {
+            font-family: 'Great Vibes', cursive;
+        }
+
+        .welcome-message h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            animation: textAnimation 2s ease-in-out;
+        }
+
+        .welcome-message p {
+            font-size: 1.5rem;
+            animation: textAnimation 1s ease-in-out;
+            color: white;
+        }
+
+        .welcome-message .moving-text {
+            white-space: nowrap;
+            display: inline-block;
+            animation: moveText 30s linear infinite;
+        }
+
+        @keyframes moveText {
+            0% {
+                transform: translateX(100%);
+            }
+
+            100% {
+                transform: translateX(-100%);
+            }
+        }
+
+        .welcome-container::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4));
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .welcome-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 0;
+        }
+
+        body {
+            font-family: "Lato", sans-serif;
+            margin: 0;
+        }
+
+        .content {
+            display: flex;
+            padding: 20px;
+        }
+
+        .filter-section {
+            width: 200px;
+            margin-right: 20px;
+        }
+
+        .filter-section .btn {
+            display: block;
+            width: 100%;
+            border: none;
+            outline: none;
+            padding: 12px 16px;
+            margin: 5px 0;
+            background-color: #f1f1f1;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+            text-align: left;
+        }
+
+        .filter-section .btn:hover {
+            background-color: #ddd;
+            transform: scale(1.05);
+        }
+
+        .filter-section .btn.active {
+            background-color: #666;
+            color: white;
+        }
+
+        .filter-section .search-container {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .filter-section input[type=text] {
+            width: 100%;
+            padding: 10px 40px 10px 10px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .filter-section .search-icon {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+        }
+
+        .rental-items-container {
+            flex: 1;
+            border: 1px solid #ccc;
+            padding: 10px;
+            position: relative;
+        }
+
+        .sort-buttons {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .sort-button,
+        .sort-buttons button {
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 10px;
+            color: #3a3a3a;
+            background: none;
+            border: none;
+            outline: none;
+            transition: color 0.3s;
+        }
+
+        .sort-button:hover,
+        .sort-buttons button:hover {
+            color: #3b3b3b;
+        }
+
+        .rental-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-top: 40px;
+        }
+
+        .rental-item {
+            text-align: center;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            overflow: hidden;
+            background: linear-gradient(135deg, #f5f7fa, #ffffff);
+            display: none;
+            flex: 0 0 calc(33.333% - 20px);
+            max-width: 290px;
+            height: 480px;
+        }
+
+        .rental-item.show {
+            display: block;
+        }
+
+        .rental-item:hover {
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .rental-item img {
+            width: 290px;
+            height: 290px;
+            object-fit: cover;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .rental-item h3 {
+            font-size: 1.4rem;
+            margin: 10px 0;
+            color: #333;
+        }
+
+        .rental-item p {
+            margin: 5px 0;
+            color: #000000;
+            text-align: center;
+        }
+
+        .rental-item .buy-button {
+            background: linear-gradient(135deg, #73eb44, #15c13a);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background 0.3s ease;
+        }
+
+        .rental-item .buy-button:hover {
+            background: linear-gradient(135deg, #01f82e, #e6ed1f);
+        }
+
+        .rental-item .out-of-stock {
+            background: linear-gradient(135deg, #ff0000, #ffd700);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: not-allowed;
+            margin-top: 10px;
+            transition: background 0.3s ease;
+        }
+
+        .rental-item-details {
+            margin: 10px;
+            text-align: left;
+        }
+
+        .rental-item-details h3,
+        .rental-item-details p {
+            text-align: center;
+        }
+
+        .rental-item-details form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .rental-item-details form .form-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            margin-bottom: 10px;
+            gap: 5px;
+        }
+
+        .rental-item-details form .form-row label {
+            flex: 1;
+            max-width: 30px;
+            text-align: right;
+        }
+
+        .rental-item-details form .form-row input {
+            flex: 2;
+            max-width: 60px;
+            height: 22px;
+            text-align: center;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .rental-item-details form .form-row:last-child input {
+            flex: 1;
+            max-width: 60px;
+            text-align: center;
+        }
+
+        .rental-item-details form .form-row button {
+            flex: 2;
+            height: 34px;
+            max-width: 120px;
+            background: linear-gradient(135deg, #73eb44, #15c13a);
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .rental-item-details form .form-row button:hover {
+            background: linear-gradient(135deg, #01f82e, #e6ed1f);
+        }
+
+        @keyframes textAnimation {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    {% if request.session.user_id %}
+    <header>
+        <div class="logo">AgroRent</div>
+        <nav>
+            <ul>
+                <li><a href="{% url 'customer_index' %}">Home</a></li>
+                <li><a href="{% url 'customer_service' %}">Services</a></li>
+                <li><a href="{% url 'products' %}">Products</a></li>
+                <li><a href="{% url 'productcart' %}">Cart</a></li>
+                <li><a href="{% url 'orderdetails' %}">Orders</a></li>
+                <li><a href="{% url 'customer_profile' %}">Profile</a></li>
+                <li><a href="{% url 'logout' %}">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <div class="welcome-container">
+            <img class="welcome-image" src="{% static 'images/welcome.jpg' %}" alt="Welcome Image">
+            <div class="welcome-message">
+                <h1>Rental Products</h1>
+                <p class="moving-text">Find the best agriculture tools and equipment for rent at AgroRent.Please order the product 2 Days before your Requirement</p>
+            </div>
+        </div>
+        <section class="content">
+            <div class="filter-section" id="myBtnContainer">
+                <div class="search-container">
+                    <input type="text" id="searchInput" onkeyup="filterProducts()" placeholder="Search for products...">
+                    <i class="search-icon fa fa-search"></i>
+                </div>
+                <button class="btn active" onclick="filterSelection('all')">Show all</button>
+                {% for category in categories %}
+                <button class="btn" onclick="filterSelection('{{ category.name }}')">{{ category.name }}</button>
+                {% endfor %}
+            </div>
+            <div class="rental-items-container">
+                <div class="sort-buttons">
+                    <button id="sortByName"><i class="fas fa-sort"></i>Sort by Name</button>
+                    <button id="sortByPrice"><i class="fas fa-sort"></i>Sort by Price</button>
+                </div>
+                <div class="rental-items" id="rentalItemsContainer">
+                    {% for product in products %}
+                    <div class="rental-item filterDiv {{ product.category.name }}">
+                        <div class="rental-item-image">
+                            <a href="{% url 'product_detail' product.id %}">
+                                <img src="{{ product.product_image.url }}" alt="{{ product.product_name }}" onclick="showDetails('{{ product.id }}')">
+                            </a>
+                        </div>
+                        <div class="rental-item-details">
+                            <h3>{{ product.product_name }}</h3>
+                            <p>₹{{ product.product_price_per_day }}</p>
+                            <form method="post" action="{% url 'add_to_cart' product.id %}">
+                                {% csrf_token %}
+                                <div class="form-row">
+                                    <label for="start_date">From:</label>
+                                    <input type="date" id="start_date_{{ forloop.counter }}" name="start_date" value="{% if cart_item %}{{ cart_item.start_date|date:'Y-m-d' }}{% endif %}" required>
+                                    <label for="end_date">To :</label>
+                                    <input type="date" id="end_date_{{ forloop.counter }}" name="end_date" value="{% if cart_item %}{{ cart_item.end_date|date:'Y-m-d' }}{% endif %}" required>
+                                </div>
+                                <div class="form-row">
+                                    <label for="quantity">Qnt:</label>
+                                    <input type="number" id="quantity" name="quantity" min="1" max="5" value="{% if cart_item %}{{ cart_item.quantity }}{% else %}1{% endif %}" required>
+                                    {% if product.stock_quantity <= 5 %}
+                                    <button type="button" class="out-of-stock" disabled>Out of Stock</button>
+                                    {% else %}
+                                    <button type="submit">Add to Cart</button>
+                                    {% endif %}
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+    </main>
+    <footer class="footer">
+        <p>&copy; 2024 Agriculture Rental Hub. All rights reserved.</p>
+    </footer>
+    <script>
+       document.addEventListener('DOMContentLoaded', function() {
+    const today = new Date().toISOString().split('T')[0];
+    const startDateInputs = document.querySelectorAll('input[name="start_date"]');
+    const endDateInputs = document.querySelectorAll('input[name="end_date"]');
+
+    startDateInputs.forEach((startDateInput, index) => {
+        startDateInput.setAttribute('min', today);
+        startDateInput.addEventListener('change', function() {
+            const selectedStartDate = new Date(this.value);
+            const minEndDate = new Date(selectedStartDate);
+            minEndDate.setDate(minEndDate.getDate() + 1); // At least 1 day after start date
+            const minEndDateStr = minEndDate.toISOString().split('T')[0];
+            endDateInputs[index].setAttribute('min', minEndDateStr);
+        });
+    });
+
+    endDateInputs.forEach((endDateInput, index) => {
+        endDateInput.setAttribute('min', today);
+        endDateInput.addEventListener('change', function() {
+            const selectedStartDate = new Date(startDateInputs[index].value);
+            const selectedEndDate = new Date(this.value);
+            if (selectedEndDate <= selectedStartDate) {
+                alert("End date must be after start date.");
+                this.value = "";
+            }
+        });
+    });
+});
+
+        filterSelection("all")
+        function filterSelection(category) {
+            var items, i;
+            items = document.getElementsByClassName("filterDiv");
+            if (category == "all") category = "";
+            for (i = 0; i < items.length; i++) {
+                w3RemoveClass(items[i], "show");
+                if (items[i].className.indexOf(category) > -1) w3AddClass(items[i], "show");
+            }
+        }
+
+        function filterProducts() {
+            var input, filter, rentalItems, items, title;
+            input = document.getElementById('searchInput');
+            filter = input.value.toUpperCase();
+            rentalItems = document.getElementById("rentalItemsContainer");
+            items = rentalItems.getElementsByClassName('rental-item');
+
+            for (var i = 0; i < items.length; i++) {
+                title = items[i].getElementsByTagName("h3")[0];
+                if (title.innerText.toUpperCase().indexOf(filter) > -1) {
+                    items[i].style.display = "";
+                } else {
+                    items[i].style.display = "none";
+                }
+            }
+        }
+
+        function w3AddClass(element, name) {
+            var i, arr1, arr2;
+            arr1 = element.className.split(" ");
+            arr2 = name.split(" ");
+            for (i = 0; i < arr2.length; i++) {
+                if (arr1.indexOf(arr2[i]) == -1) { element.className += " " + arr2[i]; }
+            }
+        }
+
+        function w3RemoveClass(element, name) {
+            var i, arr1, arr2;
+            arr1 = element.className.split(" ");
+            arr2 = name.split(" ");
+            for (i = 0; i < arr2.length; i++) {
+                while (arr1.indexOf(arr2[i]) > -1) {
+                    arr1.splice(arr1.indexOf(arr2[i]), 1);
+                }
+            }
+            element.className = arr1.join(" ");
+        }
+
+        // Add active class to the current button (highlight it)
+        var btnContainer = document.getElementById("myBtnContainer");
+        var btns = btnContainer.getElementsByClassName("btn");
+        for (var i = 0; i < btns.length; i++) {
+            btns[i].addEventListener("click", function () {
+                var current = document.getElementsByClassName("active");
+                current[0].className = current[0].className.replace(" active", "");
+                this.className += " active";
+            });
+        }
+
+        function showDetails(productId) {
+    window.location.href = `/product/${productId}/`;
+}
+
+        let sortOrder = true; // true for ascending, false for descending
+        let sortBy = 'name'; // default sort by name
+
+        function sortProducts() {
+            const container = document.getElementById('rentalItemsContainer');
+            const items = Array.from(container.getElementsByClassName('rental-item'));
+
+            items.sort((a, b) => {
+                let valueA, valueB;
+
+                if (sortBy === 'price') {
+                    valueA = parseFloat(a.querySelector('p').innerText.replace('₹', ''));
+                    valueB = parseFloat(b.querySelector('p').innerText.replace('₹', ''));
+                } else if (sortBy === 'name') {
+                    valueA = a.querySelector('h3').innerText.toUpperCase();
+                    valueB = b.querySelector('h3').innerText.toUpperCase();
+                }
+
+                if (sortOrder) {
+                    return valueA > valueB ? 1 : -1;
+                } else {
+                    return valueA < valueB ? 1 : -1;
+                }
+            });
+
+            container.innerHTML = '';
+            items.forEach(item => container.appendChild(item));
+        }
+
+        document.getElementById('sortByName').addEventListener('click', () => {
+            sortBy = 'name';
+            sortOrder = !sortOrder;
+            sortProducts();
+        });
+
+        document.getElementById('sortByPrice').addEventListener('click', () => {
+            sortBy = 'price';
+            sortOrder = !sortOrder;
+            sortProducts();
+        });
+    </script>
+
+    {% else %}
+    <p>Access Denied</p>
+    {% endif %}
+</body>
+
+</html>

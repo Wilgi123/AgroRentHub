@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cart</title>
+    {% load static %}
+    {% load custom_filters %}
+    <link rel="stylesheet" href="{% static 'css/customer/style.css' %}">
+    <script src="{% static 'js/customer/script.js' %}" defer></script>
+       <!-- Include SweetAlert2 CSS -->
+       <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+       <script src="{% static 'js/customer/script.js' %}" defer></script>
+       <!-- Include SweetAlert2 JavaScript -->
+       <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<style>
+    .welcome-container {
+        position: relative;
+        width: 100%;
+        height: 200px;
+        overflow: hidden;
+    }
+
+    .welcome-message {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        color: white;
+        z-index: 1;
+        width: 80%;
+        max-width: 600px;
+    }
+
+    .welcome-message h1,
+    .welcome-message p {
+        font-family: 'Great Vibes', cursive;
+    }
+
+    .welcome-message h1 {
+        font-size: 3rem;
+        margin-bottom: 10px;
+        animation: textAnimation 2s ease-in-out;
+    }
+
+    .welcome-message p {
+        font-size: 1.2rem;
+        animation: textAnimation 3s ease-in-out;
+    }
+
+    .welcome-container::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4));
+        z-index: 1;
+        pointer-events: none;
+    }
+
+    .welcome-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        z-index: 0;
+    }
+
+    body {
+        font-family: "Lato", sans-serif;
+        margin: 0;
+    }
+
+    .table-container {
+        padding: 20px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        background-color: #fff;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    }
+
+    th,
+    td {
+        padding: 12px 15px;
+        text-align: center;
+        border-bottom: 1px solid #ddd;
+    }
+
+    th {
+        background-color: #f2f2f2;
+        color: #333;
+    }
+
+    td {
+        background-color: #fff;
+        color: #666;
+    }
+
+    tbody tr:hover {
+        background-color: #f5f5f5;
+    }
+
+    td img {
+        max-width: 100px;
+        max-height: 100px;
+        vertical-align: middle;
+        text-align: center;
+    }
+
+    .delete-button {
+        background-color: #e74c3c;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        cursor: pointer;
+        font-size: 14px;
+        border-radius: 4px;
+        transition: background-color 0.3s;
+    }
+
+    .delete-button:hover {
+        background-color: #c0392b;
+    }
+
+    .empty-cart-message {
+        text-align: center;
+        font-size: 1.5rem;
+        color: #666;
+        padding: 20px;
+    }
+
+    .empty-cart-icon {
+        display: block;
+        margin: 20px auto;
+        max-width: 180px;
+    }
+
+    .table-summary-container {
+
+        justify-content: flex-end;
+        /* Align the summary container to the right */
+        align-items: center;
+        /* Center the summary container vertically */
+        gap: 20px;
+        /* Adjust as needed for spacing */
+    }
+
+    .table-container {
+        flex: 1;
+    }
+
+    .summary-container {
+        width: 500px;
+        /* Fixed width for the summary card */
+        padding: 20px;
+        background-color: #f9f9f9;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        max-width: 100%;
+        /* Ensures it fits within the container */
+        box-sizing: border-box;
+        /* Includes padding and border in width */
+        margin-left: auto;
+        /* Aligns the summary container to the right */
+    }
+
+
+    .summary-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid #ddd;
+        font-size: 0.9rem;
+    }
+
+    .summary-total {
+        font-weight: bold;
+        font-size: 1rem;
+        border-top: 1px solid #ddd;
+        /* Add a border-top for visual separation */
+        padding-top: 10px;
+    }
+
+    .place-order-button {
+        display: block;
+        width: 100%;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        padding: 12px;
+        cursor: pointer;
+        font-size: 16px;
+        border-radius: 8px;
+        transition: background-color 0.3s;
+        margin-top: 20px;
+        text-align: center;
+    }
+
+    .place-order-button:hover {
+        background-color: #45a049;
+    }
+</style>
+
+<body>
+    {% if request.session.user_id %}
+    <header>
+        <div class="logo">AgroRent</div>
+        <nav>
+            <ul>
+                <li><a href="{% url 'customer_index' %}">Home</a></li>
+                <li><a href="{% url 'customer_service' %}">Services</a></li>
+                <li><a href="{% url 'products' %}">Products</a></li>
+                <li><a href="{% url 'productcart' %}">Cart</a></li>
+                <li><a href="{% url 'orderdetails' %}">Orders</a></li>
+                <li><a href="{% url 'customer_profile' %}">Profile</a></li>
+                <li><a href="{% url 'logout' %}">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <section class="content">
+            <div class="welcome-container">
+                <img class="welcome-image" src="{% static 'images/welcome.jpg' %}" alt="Welcome Image">
+                <div class="welcome-message">
+                    <h1>Rental Product Cart</h1>
+                </div>
+            </div>
+           <!-- {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}-->
+            <div class="table-summary-container">
+                <div class="table-container">
+                    {% if cart_items %}
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Si.No</th>
+                                <th>Product Image</th>
+                                <th>Price Per Day</th>
+                                <th>Quantity</th>
+                                <th>Start Date</th>
+                                <th>End Date</th>
+                                <th>Days</th>
+                                <th>Price</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in cart_items %}
+                            <tr>
+                                <td class="si-no">{{ forloop.counter }}</td>
+                                <td>
+                                    {% if item.product %}
+                                    <a href="{% url 'product_detail' item.product.id %}">
+                                        <img src="{{ item.product.product_image.url }}" alt="{{ item.product.product_name }}">
+                                    </a><br>
+                                    <br>{{ item.product.product_name }}
+                                    {% else %}
+                                    <p>Product not available</p>
+                                    {% endif %}
+                                </td>
+                                <td>₹{{ item.product.product_price_per_day }}</td>
+                                <td>{{ item.quantity }}</td>
+                                <td>{{ item.start_date }}</td>
+                                <td>{{ item.end_date }}</td>
+                                <td>{{ item.start_date|date_difference:item.end_date }}</td>
+                                <td>₹{{ item|total_price }}</td>
+                                <td>
+                                    <form action="{% url 'delete_cart_item' item.id %}" method="post">
+                                        {% csrf_token %}
+                                        <button type="submit" class="delete-button">Delete</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        
+                    </table>
+                    {% else %}
+                    <div class="empty-cart-message">
+                        <img class="empty-cart-icon" src="{% static 'images/empty_cart.gif' %}" alt="Empty Cart Icon">
+                        <h2>Your cart is empty.</h2>
+                    </div>
+                    {% endif %}
+                </div>
+
+                {% if cart_items %}
+                <div class="summary-container">
+                    {% for item in cart_items %}
+                    <div class="summary-item">
+                        <span>{{ item.product.product_name }} ({{ item.quantity }} x ₹{{item.product.product_price_per_day }} x {{ item.start_date|date_difference:item.end_date }}days)</span>
+                        <span>₹{{ item|total_price }}</span>
+                    </div>
+                    {% endfor %}
+                    <div class="summary-item summary-total">
+                        <span>Total:</span>
+                        <span>₹{{ cart_items|sum_prices }}</span>
+                    </div>
+                    <form action="{% url 'place_order' %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="place-order-button">Place Order</button>
+                    </form>
+                </div>
+                {% endif %}
+            </div>
+        </section>
+        <!-- SweetAlert for Django messages -->
+{% if messages %}
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        {% for message in messages %}
+        // Mapping Django message tags to SweetAlert icons
+        let iconMap = {
+            'debug': 'info',
+            'info': 'info',
+            'success': 'success',
+            'warning': 'warning',
+            'error': 'error',
+        };
+
+        // Get the appropriate icon for SweetAlert
+        let icon = iconMap['{{ message.tags }}'] || 'info'; // Default to 'info' if tag isn't found
+
+        Swal.fire({
+            title: '{{ message.tags|title }}',
+            text: '{{ message }}',
+            icon: icon,
+            confirmButtonText: 'OK'
+        });
+        {% endfor %}
+    });
+</script>
+{% endif %}
+
+    </main>
+    <footer class="footer">
+        <p>&copy; 2024 Agriculture Rental Hub. All rights reserved.</p>
+    </footer>
+    {% else %}
+    <p>Access Denied</p>
+    {% endif %}
+    <script src="{% static 'js/customer/script.js' %}" defer></script>
+</body>
+
+</html>

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delivery Boy Dashboard - AgroRent Hub</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/deliveryboy/style.css' %}">
+    <script src="{% static 'js/deliveryboy/script.js' %}" defer></script>
+</head>
+<body>
+    {% if request.session.user_id %}
+    <header>
+        <div class="logo">AgroRent DeliveryBoy Panel</div>
+        <nav>
+            <ul>
+                <a href="{% url 'deliveryboy_profile' %}" class="button profile">Profile</a>
+                <a href="{% url 'logout' %}" class="button logout">Sign Out</a>
+                
+            </ul>
+        </nav>
+    </header>
+    <div class="container">
+        <div class="sidebar">
+            <nav>
+                <ul>
+                    <li><a href="{% url 'deliveryboy_index' %}" data-page="deliveryboy_index">Dashboard</a></li>
+                    <li><a href="{% url 'deliveryboy_view_order' %}" data-page="deliveryboy_view_order">View Orders</a></li>
+                    <li><a href="{% url 'deliveryboy_return_management' %}" data-page="deliveryboy_return_management">Return Management</a></li> 
+                    <!--<li><a href="{% url 'deliveryboy_view_damages' %}" data-page="deliveryboy_view_damages">View Damaged Products</a></li>-->
+                    <li><a href="{% url 'deliveryboy_view_damages_chart' %}" data-page="deliveryboy_view_damages_chart">Repair Cost Details</a></li>
+
+                    <li><a href="{% url 'deliveryboy_deliveries' %}" data-page="deliveryboy_deliveries">My Deliveries</a></li>
+                    <li><a href="{% url 'deliveryboy_earnings' %}" data-page="deliveryboy_earnings">Earnings</a></li>
+                    <li><a href="{% url 'deliveryboy_support' %}" data-page="deliveryboy_support">Support</a></li>
+                </ul>
+            </nav>
+        </div>
+        <div class="main" id="main-content">
+            <h2>Damaged Products</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Damage Level</th>
+                        <th>Damage Type</th>
+                        <th>Estimated Repair Cost</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for damage in damaged_products %}
+                    <tr>
+                        <td>{{ damage.product.product_name }}</td>
+                        <td>{{ damage.get_damage_level_display }}</td>
+                        <td>{{ damage.get_damage_type_display }}</td>
+                        <td>Rs. {{ damage.estimated_repair_cost }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+    </div><br>
+    <footer class="footer">
+            <p>&copy; 2024 AgroRent Hub. All rights reserved.</p>
+    </footer>
+    {% else %}
+    <div class="container">
+        <p>Access Denied</p>
+    </div>
+    {% endif %}
+</body>
+</html>

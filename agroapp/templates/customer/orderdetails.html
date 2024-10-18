@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cart</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/customer/style.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+</head>
+<style>
+    .welcome-container {
+        position: relative;
+        width: 100%;
+        height: 200px;
+        overflow: hidden;
+    }
+
+    .welcome-message {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        color: white;
+        z-index: 1;
+        width: 80%;
+        max-width: 600px;
+    }
+
+    .welcome-message h1,
+    .welcome-message p {
+        font-family: 'Great Vibes', cursive;
+    }
+
+    .welcome-message h1 {
+        font-size: 3rem;
+        margin-bottom: 10px;
+        animation: textAnimation 2s ease-in-out;
+    }
+
+    .welcome-message p {
+        font-size: 1.2rem;
+        animation: textAnimation 3s ease-in-out;
+    }
+
+    .welcome-container::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4));
+        z-index: 1;
+        pointer-events: none;
+    }
+
+    .welcome-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        z-index: 0;
+    }
+
+    body {
+        font-family: "Lato", sans-serif;
+        margin: 0;
+    }
+
+    .table-container {
+        padding: 20px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        background-color: #fff;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    }
+
+    th,
+    td {
+        padding: 12px 15px;
+        text-align: center;
+        border-bottom: 1px solid #ddd;
+    }
+
+    th {
+        background-color: #f2f2f2;
+        color: #333;
+    }
+
+    td {
+        background-color: #fff;
+        color: #666;
+    }
+
+    tbody tr:hover {
+        background-color: #f5f5f5;
+    }
+
+    
+    .order-summary-container {
+        max-width: 95%;
+        margin: 0 auto;
+    }
+
+    .order-summary-header {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    .order-summary-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .order-summary-total {
+        font-size: 18px;
+        font-weight: bold;
+    }
+    .delete-button {
+        background-color: #e62712;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        cursor: pointer;
+        font-size: 14px;
+        border-radius: 4px;
+        transition: background-color 0.3s;
+    }
+
+    .delete-button:hover {
+        background-color: #c82a18;
+    }
+    .download-button {
+        background-color: #131313;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        cursor: pointer;
+        font-size: 14px;
+        border-radius: 4px;
+        transition: background-color 0.3s;
+    }
+
+    .download-button:hover {
+        background-color: #0e0e0e;
+    }
+    
+    .order-messageage {
+        text-align: center;
+        font-size: 1.5rem;
+        color: #666;
+        padding: 20px;
+    }
+    table a {
+    text-decoration: none;
+    color: inherit; /* Keeps the link color consistent with the surrounding text */
+}
+
+
+
+    .empty-cart-icon {
+        display: block;
+        margin: 20px auto;
+        max-width: 180px;
+    }
+</style>
+
+<body>
+    {% if request.session.user_id %}
+    <header>
+        <div class="logo">AgroRent</div>
+        <nav>
+            <ul>
+                <li><a href="{% url 'customer_index' %}">Home</a></li>
+                <li><a href="{% url 'customer_service' %}">Services</a></li>
+                <li><a href="{% url 'products' %}">Products</a></li>
+                <li><a href="{% url 'productcart' %}">Cart</a></li>
+                <li><a href="{% url 'orderdetails' %}">Orders</a></li>
+                <li><a href="{% url 'customer_profile' %}">Profile</a></li>
+                <li><a href="{% url 'logout' %}">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <section class="content">
+            <div class="welcome-container">
+                <img class="welcome-image" src="{% static 'images/welcome.jpg' %}" alt="Welcome Image">
+                <div class="welcome-message">
+                    <h1>Order Details</h1>
+                </div>
+            </div>
+            <div class="order-summary-container">
+                <h1 class="order-summary-header">Order Summary</h1>
+                {% if orders %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Si.No</th>
+                            <th>Product</th>
+                            <th>Name</th>
+                            <th>Quantity</th>
+                            <!---<th>Start Date</th>
+                            <th>End Date</th>--->
+                            <th>Price</th>
+                            <th>Order Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in orders %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td> <a href="{% url 'orderproductview' order.id %}">
+                                <img src="{{ order.product.product_image.url }}" alt="{{ order.product.product_name }}" style="width: 50px; height: 50px; object-fit: cover; margin-right: 10px;"></a></td>
+                                <td>{{ order.product.product_name }}</td>
+                            <td>{{ order.quantity }}</td>
+                           <!-- <td>{{ order.start_date }}</td>
+                            <td>{{ order.end_date }}</td>--->
+                            <td>{{ order.price }}</td>
+                            <td>{{ order.ordered_at }}</td>
+                            <td>
+                                <form action="{% url 'download_receipt' order.id %}" method="get" style="display: inline;">
+                                    <button type="submit" class="download-button" style="padding: 8px;">
+                                        <!---<i class="fa-solid fa-receipt"></i>---><i class="fa fa-download" aria-hidden="true"></i>
+                                    </button>
+                                </form>
+                                <form action="{% url 'delete_order' order.id %}" method="post" style="display: inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="delete-button" style="padding: 8px;"><i class="fa fa-trash" aria-hidden="true"></i></button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div class="order-message">
+                    <img class="empty-cart-icon" src="{% static 'images/noorder.jpg' %}" alt="Empty Cart Icon">
+                </div>
+               
+                {% endif %}
+            </div>
+        </section>
+    </main><br><br>
+    <footer class="footer">
+        <p>&copy; 2024 Agriculture Rental Hub. All rights reserved.</p>
+    </footer>
+    {% else %}
+    <p>Access Denied</p>
+    {% endif %}
+    <script src="{% static 'js/customer/script.js' %}" defer></script>
+</body>
+
+</html>

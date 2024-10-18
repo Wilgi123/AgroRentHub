@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delivery Boy Dashboard - AgroRent Hub</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/deliveryboy/style.css' %}">
+    <script src="{% static 'js/deliveryboy/script.js' %}" defer></script>
+    <style>
+        /* Table container */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+    
+    
+
+        /* Price column styling */
+        table td:last-child {
+            color: #020a50;
+            font-weight: bold;
+        }
+
+        /* Responsive design: table wrapping */
+        @media (max-width: 768px) {
+            table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+        }
+
+        .modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        .modal input {
+            margin-bottom: 10px;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: calc(100% - 20px);
+        }
+
+        .modal button {
+            padding: 8px 12px;
+            margin: 5px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .modal #verify-otp-button {
+            background: linear-gradient(135deg, #23c01d, #058305);
+            color: white;
+        }
+
+        .modal #cancel-otp-button {
+            background: linear-gradient(135deg, #f31212, #a8180b);
+            color: white;
+        }
+        #otpModal {
+        display: none;
+    }
+    /* Ship Product Button styling */
+.ship-button {
+    background: linear-gradient(135deg, #05d3e1, #0caed6);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.ship-button:hover {
+    background-color: #1E88E5; /* Darker blue on hover */
+}
+
+/* Delivered Button styling */
+.delivered-button {
+    background: linear-gradient(135deg, #23c01d, #058305);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer; /* Indicates that the button is not clickable */
+    border-radius: 5px;
+}
+
+.delivered-button:hover {
+    background-color: #058305; /* Darker green on hover */
+}
+
+    </style>
+</head>
+
+<body>
+    {% if request.session.user_id %}
+    <header>
+        <div class="logo">AgroRent DeliveryBoy Panel</div>
+        <nav>
+            <ul>
+                <a href="{% url 'deliveryboy_profile' %}" class="button profile">Profile</a>
+                <a href="{% url 'logout' %}" class="button logout">Sign Out</a>
+            </ul>
+        </nav>
+    </header>
+    <div class="container">
+        <div class="sidebar">
+            <nav>
+                <ul>
+                    <li><a href="{% url 'deliveryboy_index' %}" data-page="deliveryboy_index">Dashboard</a></li>
+                    <li><a href="{% url 'deliveryboy_view_order' %}" data-page="deliveryboy_view_order">View Orders</a></li>
+                    <li><a href="{% url 'deliveryboy_return_management' %}" data-page="deliveryboy_return_management">Return Management</a></li> <!-- New Section -->
+                    <!--<li><a href="{% url 'deliveryboy_view_damages' %}" data-page="deliveryboy_view_damages">View Damaged Products</a></li>-->
+                    <li><a href="{% url 'deliveryboy_view_damages_chart' %}" data-page="deliveryboy_view_damages_chart">Repair Cost Details</a></li>
+
+                    <li><a href="{% url 'deliveryboy_deliveries' %}" data-page="deliveryboy_deliveries">My Deliveries</a></li>
+                    <li><a href="{% url 'deliveryboy_earnings' %}" data-page="deliveryboy_earnings">Earnings</a></li>
+                    <li><a href="{% url 'deliveryboy_support' %}" data-page="deliveryboy_support">Support</a></li>
+                </ul>
+            </nav>
+        </div>
+        <div class="main">
+            <h2>Assigned Orders</h2>
+            {% if orders %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Si.No</th>
+                        <th>Customer</th>
+                        <th>Product</th>
+                        <th>Supplier</th>
+                        <th>Quantity</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                        <th>Price</th>
+                        <th>Action</th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ order.user.name }}</td>
+                        <td>{{ order.product.product_name }}</td>
+                        <td>{{ order.product.supplier.name }}</td>
+                        <td>{{ order.quantity }}</td>
+                        <td>{{ order.start_date }}</td>
+                        <td>{{ order.end_date }}</td>
+                        <td>₹{{ order.price }}</td>
+                        <td>
+                            {% if order.delivery_status == 'delivered' %}
+                            <span>Delivered</span>
+                            {% elif order.shipping_status == 'shipped' %}
+                            <button class="delivered-button" data-order-id="{{ order.id }}">Deliver</button>
+                            {% else %}
+                            <button class="ship-button" data-order-id="{{ order.id }}">Ship Product</button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    
+                </tbody>
+            </table>
+            {% else %}
+            <p>No assigned orders.</p>
+            {% endif %}
+        </div>
+    </div>
+    <br>
+    <footer class="footer">
+        <p>&copy; 2024 AgroRent Hub. All rights reserved.</p>
+    </footer>
+    <!-- OTP Modal -->
+    <!-- OTP Modal -->
+    <div id="otpModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Enter OTP</h2>
+            <p>An OTP has been sent to the customer's email. Please enter the OTP to confirm delivery.</p>
+            <input type="text" id="otpInput" placeholder="Enter OTP">
+            <button id="verify-otp-button">Verify OTP</button>
+            <button id="cancel-otp-button">Cancel</button>
+            <div id="otpMessage"></div>
+        </div>
+    </div>
+
+
+    {% else %}
+    <div class="container">
+        <p>Access Denied</p>
+    </div>
+    {% endif %}
+</body>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".ship-button").forEach(button => {
+        button.addEventListener("click", function () {
+            const orderId = this.dataset.orderId;
+
+            fetch("{% url 'ship_order' %}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": "{{ csrf_token }}"
+                },
+                body: JSON.stringify({ order_id: orderId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    // Change button to "Deliver"
+                    this.textContent = "Deliver";
+                    this.classList.remove("ship-button");
+                    this.classList.add("delivered-button");
+                } else {
+                    console.error("Failed to update order status");
+                }
+            })
+            .catch(error => console.error("Error:", error));
+        });
+    });
+
+    document.addEventListener("click", function (event) {
+        if (event.target.classList.contains("delivered-button")) {
+            const orderId = event.target.dataset.orderId;
+
+            const otpModal = document.getElementById('otpModal');
+            otpModal.style.display = 'block';
+
+            fetch("{% url 'generate_otp_delivery' %}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": "{{ csrf_token }}"
+                },
+                body: JSON.stringify({ order_id: orderId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    // OTP successfully sent
+                } else {
+                    console.error("Failed to generate OTP");
+                }
+            })
+            .catch(error => console.error("Error:", error));
+
+            otpModal.setAttribute('data-order-id', orderId);
+        }
+    });
+
+    document.getElementById('verify-otp-button').addEventListener('click', function () {
+        const otpModal = document.getElementById('otpModal');
+        const orderId = otpModal.getAttribute('data-order-id');
+        const otp = document.getElementById('otpInput').value;
+
+        fetch("{% url 'verify_otp_delivery' %}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": "{{ csrf_token }}"
+            },
+            body: JSON.stringify({ order_id: orderId, otp: otp })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                // Find the button and update its text to "Delivered"
+                const button = document.querySelector(`button[data-order-id="${orderId}"]`);
+                button.parentNode.innerHTML = "<span>Delivered</span>";
+                otpModal.style.display = 'none';
+            } else {
+                // Display error message if OTP verification fails
+                document.getElementById('otpMessage').textContent = data.message;
+            }
+        })
+        .catch(error => console.error("Error:", error));
+    });
+
+    document.querySelector('.close').addEventListener('click', function () {
+        const otpModal = document.getElementById('otpModal');
+        otpModal.style.display = 'none';
+    });
+
+    document.getElementById('cancel-otp-button').addEventListener('click', function () {
+        const otpModal = document.getElementById('otpModal');
+        otpModal.style.display = 'none';
+    });
+});
+
+
+</script>
+
+
+</html>

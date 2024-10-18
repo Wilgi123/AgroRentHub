@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - AgroRent Hub</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <div class="full-page">
+        <div class="navbar">
+            <div>
+                <a href="{% url 'index' %}">AgroRent Hub</a>
+            </div>
+            <nav>
+                <ul id="MenuItems">
+                    <li><a href="{% url 'index' %}">Home</a></li>
+                    <li><a href="{% url 'about_us' %}">About Us</a></li>
+                    <li><a href="{% url 'services' %}">Services</a></li>
+                    <li><a href="{% url 'rental_items' %}">Products</a></li>
+                    <li><a href="{% url 'contact' %}">Contact</a></li>
+                    <li><a href="{% url 'login' %}">Login</a></li>
+                    <li><a href="{% url 'register' %}">Register</a></li>
+                </ul>
+            </nav>
+        </div>
+        <div class="content-section">
+            <div class="form-box-login">
+                <form class="input-group-login" method="post" action="{% url 'login' %}">
+                    {% csrf_token %}
+                    <h1 style="color: white; text-align: center; margin-top: 0;">Login</h1>
+                    {% if messages %}
+                        {% for message in messages %}
+                            <p style="color: red; font-weight: 800;text-align: center;">{{ message }}</p>
+                        {% endfor %}
+                    {% endif %}
+                    <input type="email" class="input-field" name="email" placeholder="Email" required><br><br>
+                    <input type="password" class="input-field" name="password" placeholder="Password" required><br><br>
+                    <a href="{% url 'forgotpassword' %}" style="color: aqua;font-size: 20px; text-align:left;">Forgot Password?</a><br><br>
+                    <button type="submit" class="submit-btn">Login</button><br>
+                    <p style="color: white; text-align: center;font-size: 20px;">Don't have an account? <a href="{% url 'register' %}" style="color: aqua;font-size: 20px;">Register</a></p>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script>
+        window.history.pushState(null, '', window.location.href);
+        window.onpopstate = function() {
+            window.history.pushState(null, '', window.location.href);
+        };
+    </script>
+</body>
+</html>

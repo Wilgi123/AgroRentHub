@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/admin/style.css' %}">
+    <script src="{% static 'js/admin/script.js' %}" defer></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        .navbar, .sidebar, .main, footer {
+            padding: 10px;
+        }
+        .navbar {
+            background-color: #4CAF50;
+            color: white;
+        }
+        
+        .sidebar a {
+            display: block;
+            color: white;
+            padding: 15px;
+            text-decoration: none;
+        }
+        
+        .stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .stat-box {
+            background-color: white;
+            width: calc((100% / 4) - 20px); /* Four boxes per row with spacing */
+            padding: 20px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            box-sizing: border-box;
+            height: 200px; /* Fixed height */
+        }
+        .stat-box .icon {
+            font-size: 3rem; /* Increased the icon size */
+            color: #4CAF50;
+        }
+        .stat-box .details {
+            text-align: right;
+        }
+        .stat-box .details h3 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+        .stat-box .details p {
+            margin: 0;
+            color: #777;
+        }
+        .recent-activity, .notifications, .quick-actions {
+            background-color: white;
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            box-sizing: border-box;
+        }
+        .recent-activity h3, .notifications h3, .quick-actions h3 {
+            margin-top: 0;
+        }
+        .activity-list, .notification-list, .action-list {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+        .activity-list li, .notification-list li, .action-list li {
+            padding: 10px 0;
+            border-bottom: 1px solid #f4f4f4;
+        }
+        .disable-enable-btn {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .disable-btn {
+            background: linear-gradient(135deg, #f31212, #a8180b);
+            color: white;
+        }
+        .enable-btn {
+            background: linear-gradient(135deg, #23c01d, #058305);
+            color: white;
+        }
+        footer {
+            text-align: center;
+            padding: 5px;
+            color: white;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
+            left: 0;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body>
+    {% if request.session.user_id %}
+    <header>
+        <div class="logo">AgroRent Admin Panel</div>
+        <nav>
+            <ul>
+                <li><b><a href="{% url 'logout' %}">SignOut</a></b></li>
+            </ul>
+        </nav>
+    </header>
+    <div class="sidebar">
+        <a href="{% url 'admin_index' %}" data-page="admin_index">Dashboard</a>
+        <a href="{% url 'admin_view_farmer' %}" data-page="admin_view_pro">View Farmers</a>
+        <a href="{% url 'admin_view_supplier' %}" data-page="admin_view_pro">View Suppliers</a>
+        <a href="{% url 'admin_view_deliveryboy' %}" data-page="admin_view_del">View Delivery Boys</a>
+        <a href="{% url 'admin_view_pro' %}" data-page="admin_view_pro">View Rental Product</a>
+        <a href="{% url 'admin_view_cat' %}" data-page="admin_view_cat">View Category</a>
+        <a href="{% url 'admin_view_order' %}" data-page="admin_view_order">View Orders</a>
+        <a href="{% url 'admin_view_damagedpro' %}" data-page="admin_view_damagedpro">View Damaged Products</a>
+    </div>
+    <div class="main">
+        <h1>Product Categories</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Si.No</th>
+                    <th>Category Name</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for category in categories %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ category.name }}</td>
+                    <td>
+                        <button class="disable-enable-btn {% if category.is_disabled %}enable-btn{% else %}disable-btn{% endif %}"
+                                data-category-id="{{ category.id }}">
+                            {% if category.is_disabled %}Enable{% else %}Disable{% endif %}
+                        </button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div><br><br><br>
+    <footer>
+        <p>&copy; 2024 Agriculture Rental Hub. All rights reserved.</p>
+    </footer>
+    {% else %}
+    <p>Access Denied</p>
+    {% endif %}
+</body>
+<script>
+   document.querySelectorAll('.disable-enable-btn').forEach(button => {
+    button.addEventListener('click', function() {
+        const categoryId = this.getAttribute('data-category-id');
+        const action = this.classList.contains('disable-btn') ? 'disable' : 'enable';
+
+        fetch(`{% url 'toggle_category_status' %}?id=${categoryId}&action=${action}`, {
+            method: 'GET',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        }).then(response => response.json())
+          .then(data => {
+              if (data.success) {
+                  if (data.new_status) {
+                      this.textContent = 'Disable';
+                      this.classList.remove('enable-btn');
+                      this.classList.add('disable-btn');
+                  } else {
+                      this.textContent = 'Enable';
+                      this.classList.remove('disable-btn');
+                      this.classList.add('enable-btn');
+                  }
+              }
+          });
+    });
+});
+
+</script>
+</html>

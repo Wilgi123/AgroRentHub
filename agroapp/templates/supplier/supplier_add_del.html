@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Delivery Boy</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/supplier/style.css' %}">
+    <style>
+        .error {
+            color: red;
+            font-size: 16px;
+            margin-top: -10px;
+            margin-bottom: 10px;
+            font-weight: 800;
+        }
+    </style>
+    <script src="{% static 'js/supplier/script.js' %}" defer></script>
+</head>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f4;
+    }
+    .logo {
+        font-size: 24px;
+        font-weight: bold;
+    }
+    .navbar, .sidebar, .main, footer {
+        padding: 10px;
+    }
+    .navbar {
+        background-color: #4CAF50;
+        color: white;
+    }
+    
+    .sidebar a {
+        display: block;
+        color: white;
+        padding: 15px;
+        text-decoration: none;
+    }
+    .sidebar a:hover {
+        background-color: #575757;
+    }
+    .main {
+        margin-left: 220px;
+        padding: 20px;
+        min-height: calc(100vh - 60px); /* Adjusted to account for header height */
+    }
+    .form-container {
+        background-color: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .form-container label {
+        display: block;
+        margin-bottom: 8px;
+    }
+    .form-container input, .form-container textarea, .form-container select {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 15px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+    }
+    .form-container button {
+        background-color: #4CAF50;
+        color: white;
+        padding: 10px 15px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    .form-container button:hover {
+        background-color: #45a049;
+    }
+</style>
+<body>
+    {% if request.session.user_id %}
+    <header>
+        <div class="logo">AgroRent Supplier Panel</div>
+        <nav>
+            <ul>
+                <li><a href="{% url 'supplier_profile' %}">Profile</a></li>
+                <li><a href="{% url 'logout' %}">SignOut</a></li>
+            </ul>
+        </nav>
+    </header>
+    <div class="sidebar">
+        <a href="{% url 'supplier_index' %}" data-page="supplier_index">Dashboard</a>
+        <a href="{% url 'supplier_add_pro' %}" data-page="supplier_add_pro">Add Rental Products</a>
+        <a href="{% url 'supplier_view_pro' %}" data-page="supplier_view_pro">View Rental Products</a>
+        <a href="{% url 'supplier_add_cat' %}" data-page="supplier_add_cat">Add Categories</a>
+        <a href="{% url 'supplier_view_cat' %}" data-page="supplier_view_cat">View Categories</a>
+        <a href="{% url 'add_product_damage' %}" data-page="supplier_add_pro">Add Cost For Damaged Product</a>
+        <a href="{% url 'view_product_damage' %}" data-page="supplier_add_pro">View Cost For Damaged Product</a>
+        <a href="{% url 'supplier_view_order' %}" data-page="supplier_view_order">View Orders</a>
+        <!--<a href="{% url 'supplier_add_del' %}" data-page="supplier_add_del">ADD DELIVERY BOY</a>
+        <a href="{% url 'supplier_view_del' %}" data-page="supplier_view_del">VIEW DELIVERY BOY</a>
+        <a href="{% url 'supplier_view_order' %}" data-page="supplier_view_order">VIEW ORDERS</a>-->
+    </div>
+    <div class="main" id="main-content">
+        <h2>Add Delivery Boy</h2>
+        <div class="form-container">
+            <form action="{% url 'supplier_add_del' %}" method="post" onsubmit="return validateForm()" id="addDeliveryBoyForm">
+                {% csrf_token %}
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="name" required>
+                <p id="nameError" class="error"></p>
+                
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required>
+                <p id="emailError" class="error"></p>
+                
+                <label for="address">Address:</label>
+                <textarea id="address" name="address" required></textarea>
+                <p id="addressError" class="error"></p>
+                
+                <label for="phone">Phone:</label>
+                <input type="text" id="phone" name="phone" required>
+                <p id="phoneError" class="error"></p>
+                
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required>
+                <p id="passwordError" class="error"></p>
+                
+                <label for="confirmPassword">Confirm Password:</label>
+                <input type="password" id="confirmPassword" required>
+                <p id="confirmPasswordError" class="error"></p>
+                
+                <label for="status">Status:</label>
+                <select id="status" name="status" required>
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                </select>
+                
+                <button type="submit">Add Delivery Boy</button>
+            </form>
+        </div>
+    </div>
+    <footer>
+        <p>&copy; 2024 Agriculture Rental Hub. All rights reserved.</p>
+    </footer>
+    {% else %}
+    <p>Access Denied</p>
+    {% endif %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const nameField = document.getElementById('name');
+            const emailField = document.getElementById('email');
+            const addressField = document.getElementById('address');
+            const phoneField = document.getElementById('phone');
+            const passwordField = document.getElementById('password');
+            const confirmPasswordField = document.getElementById('confirmPassword');
+
+            const nameError = document.getElementById('nameError');
+            const emailError = document.getElementById('emailError');
+            const addressError = document.getElementById('addressError');
+            const phoneError = document.getElementById('phoneError');
+            const passwordError = document.getElementById('passwordError');
+            const confirmPasswordError = document.getElementById('confirmPasswordError');
+
+            const namePattern = /^[A-Z][a-zA-Z\s.]*$/;
+            const emailPattern = /^[a-zA-Z0-9._%+-]+@(gmail\.com|yahoo\.com|mca\.ajce\.in)$/;
+            const phonePattern = /^[6-9][0-9]{9,13}$/;
+            const addressPattern = /^[a-zA-Z0-9.,\s]+$/;
+            const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
+            function validateName() {
+                const nameValue = nameField.value.trim();
+                if (!namePattern.test(nameValue) || /\s{2,}/.test(nameValue) || /^\s/.test(nameValue)) {
+                    nameError.textContent = "Invalid name. Start with a capital letter";
+                    return false;
+                }
+                nameError.textContent = "";
+                return true;
+            }
+
+            function validateEmail() {
+                if (!emailPattern.test(emailField.value)) {
+                    emailError.textContent = "Invalid email format. Only popular domains are allowed.";
+                    return false;
+                }
+                emailError.textContent = "";
+                return true;
+            }
+
+            function validateAddress() {
+                if (!addressPattern.test(addressField.value.trim()) || /\s{2,}/.test(addressField.value)) {
+                    addressError.textContent = "Invalid address. No leading/trailing spaces.";
+                    return false;
+                }
+                addressError.textContent = "";
+                return true;
+            }
+
+            function validatePhone() {
+                if (!phonePattern.test(phoneField.value) || /^(.)\1*$/.test(phoneField.value)) {
+                    phoneError.textContent = "Invalid phone number. Start with 6-9 and 10-13 digits.";
+                    return false;
+                }
+                phoneError.textContent = "";
+                return true;
+            }
+
+            function validatePassword() {
+                if (!passwordPattern.test(passwordField.value)) {
+                    passwordError.textContent = "Password must have at least one uppercase, one lowercase, one number, one special character, and 8 characters.";
+                    return false;
+                }
+                passwordError.textContent = "";
+                return true;
+            }
+
+            function validateConfirmPassword() {
+                if (passwordField.value !== confirmPasswordField.value) {
+                    confirmPasswordError.textContent = "Passwords do not match.";
+                    return false;
+                }
+                confirmPasswordError.textContent = "";
+                return true;
+            }
+
+            function validateForm() {
+                return validateName() && validateEmail() && validateAddress() && validatePhone() && validatePassword() && validateConfirmPassword();
+            }
+
+            nameField.addEventListener('input', validateName);
+            emailField.addEventListener('input', validateEmail);
+            addressField.addEventListener('input', validateAddress);
+            phoneField.addEventListener('input', validatePhone);
+            passwordField.addEventListener('input', validatePassword);
+            confirmPasswordField.addEventListener('input', validateConfirmPassword);
+
+            document.getElementById('addDeliveryBoyForm').onsubmit = validateForm;
+        });
+    </script>
+</body>
+</html>

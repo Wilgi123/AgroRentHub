@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Return Product</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/deliveryboy/style.css' %}">
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <style>
+        
+
+        h2 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        .form-group input[type="file"] {
+            padding: 3px;
+        }
+
+        .form-group button {
+            background: linear-gradient(135deg, #ff7700,#fe4501);
+            /* Matching button color */
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .form-group button:hover {
+            background-color: #E64A19;
+            /* Darker shade on hover */
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .container {
+                width: 95%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    {% if request.session.user_id %}
+    <header>
+        <div class="logo">AgroRent DeliveryBoy Panel</div>
+        <nav>
+            <ul>
+                <a href="{% url 'deliveryboy_profile' %}" class="button profile">Profile</a>
+                <a href="{% url 'logout' %}" class="button logout">Sign Out</a>
+            </ul>
+        </nav>
+    </header>
+    <div class="container">
+        <div class="sidebar">
+            <nav>
+                <ul>
+                    <li><a href="{% url 'deliveryboy_index' %}" data-page="deliveryboy_index">Dashboard</a></li>
+                    <li><a href="{% url 'deliveryboy_view_order' %}" data-page="deliveryboy_view_order">View Orders</a></li>
+                    <li><a href="{% url 'deliveryboy_return_management' %}" data-page="deliveryboy_return_management">Return Management</a></li>
+                    <!--<li><a href="{% url 'deliveryboy_view_damages' %}" data-page="deliveryboy_view_damages">View Damaged Products</a></li>-->
+                    <li><a href="{% url 'deliveryboy_view_damages_chart' %}" data-page="deliveryboy_view_damages_chart">Repair Cost Details</a></li>
+
+                    <li><a href="{% url 'deliveryboy_deliveries' %}" data-page="deliveryboy_deliveries">My Deliveries</a></li>
+                    <li><a href="{% url 'deliveryboy_earnings' %}" data-page="deliveryboy_earnings">Earnings</a></li>
+                    <li><a href="{% url 'deliveryboy_support' %}" data-page="deliveryboy_support">Support</a></li>
+                </ul>
+            </nav>
+        </div>
+        <div class="main">
+        <h2>Return Product for Order {{ order.id }}</h2>
+
+
+        <form method="post" enctype="multipart/form-data" id="return-product-form">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="customer_name">Customer Name</label>
+                <input type="text" id="customer_name" name="customer_name" value="{{ order.user.name}}"
+                    readonly>
+            </div>
+            <div class="form-group">
+                <label for="product_name">Product Name</label>
+                <input id="product_name" name="product_name" value="{{ order.product.product_name }}"
+                readonly>
+               
+            </div>
+            
+            <div class="form-group">
+                <label for="quantity">Quantity</label>
+                <input type="number" id="quantity" name="quantity" value="{{ form.quantity.value }}" required>
+            </div>
+            <div class="form-group">
+                <label for="damage_level">Damage Level</label>
+                <select id="damage_level" name="damage_level">
+                    <option value="minor">Minor</option>
+                    <option value="moderate">Moderate</option>
+                    <option value="severe">Severe</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="damage_type">Damage Type</label>
+                <select id="damage_type" name="damage_type">
+                    <option value="physical">Physical</option>
+                    <option value="operational">Operational</option>
+                    <option value="wear_and_tear">Wear and Tear</option>
+                </select>
+            </div>
+           <!-- <div class="form-group">
+                <label for="damage_photos">Damage Photos</label>
+                <input type="file" id="damage_photos" name="damage_photos">
+            </div>-->
+            <div class="form-group">
+                <label for="estimated_repair_cost">Estimated Repair Cost</label>
+                <input type="number" id="estimated_repair_cost" name="estimated_repair_cost" step="0.01" readonly>
+            </div>
+            <div class="form-group">
+                <label for="total_repair_cost">Total Repair Cost</label>
+                <input type="number" id="total_repair_cost" name="total_repair_cost" step="0.01" readonly>
+            </div>
+            <div class="form-group">
+                <button type="button" id="pay-button">Pay Now</button>
+            </div>
+        </form>
+
+    </div><br><br>
+    <footer class="footer">
+        <p>&copy; 2024 AgroRent Hub. All rights reserved.</p>
+    </footer>
+    {% else %}
+    <div class="container">
+        <p>Access Denied</p>
+    </div>
+    {% endif %}
+</body><script>
+    function fetchEstimatedRepairCost() {
+        const productName = document.getElementById('product_name').value;
+        const damageLevel = document.getElementById('damage_level').value;
+        const damageType = document.getElementById('damage_type').value;
+        const quantity = document.getElementById('quantity').value;
+
+        if (productName && damageLevel && damageType) {
+            fetch(`/get-estimated-repair-cost/?product_name=${productName}&damage_level=${damageLevel}&damage_type=${damageType}`)
+                .then(response => response.json())
+                .then(data => {
+                    const estimatedRepairCost = parseFloat(data.estimated_repair_cost);
+                    document.getElementById('estimated_repair_cost').value = estimatedRepairCost.toFixed(2);
+
+                    // Calculate the total repair cost based on the quantity
+                    const totalRepairCost = estimatedRepairCost * parseFloat(quantity);
+                    document.getElementById('total_repair_cost').value = totalRepairCost.toFixed(2);
+                })
+                .catch(error => {
+                    console.error('Error fetching estimated repair cost:', error);
+                });
+        }
+    }
+
+    function openRazorpayPayment() {
+        const totalRepairCost = parseFloat(document.getElementById('total_repair_cost').value);
+        const options = {
+            key: "rzp_test_IHsYiv67CqdAaf", // Replace with your Razorpay key ID
+            amount: totalRepairCost * 100, // Amount in paise
+            currency: "INR",
+            name: "AgroRent Hub",
+            description: "Product Return Payment",
+            handler: function (response) {
+                // Submit the form after successful payment
+                const form = document.getElementById('return-product-form');
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'razorpay_payment_id';
+                input.value = response.razorpay_payment_id;
+                form.appendChild(input);
+                form.submit();
+            },
+            prefill: {
+                name: document.getElementById('customer_name').value,
+            },
+            theme: {
+                color: "#FF7700"
+            }
+        };
+        const rzp = new Razorpay(options);
+        rzp.open();
+    }
+
+    document.getElementById('damage_level').addEventListener('change', fetchEstimatedRepairCost);
+    document.getElementById('damage_type').addEventListener('change', fetchEstimatedRepairCost);
+    document.getElementById('quantity').addEventListener('input', fetchEstimatedRepairCost);
+    document.getElementById('pay-button').addEventListener('click', openRazorpayPayment);
+</script>
+
+
+
+</html>

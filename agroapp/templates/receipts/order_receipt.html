@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 20px;
+           
+        }
+
+        .invoice {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .invoice-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #dee2e6;
+            padding-bottom: 20px;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #045c0a;
+        }
+
+        .info p {
+            font-size: 15px;
+            margin: 5px 0;
+            color: #171717;
+        }
+
+        .invoice-item h3 {
+            margin-top: 20px;
+            font-size: 20px;
+            color: #045c0a;
+            padding-bottom: 10px;
+
+        }
+
+        .invoice-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .invoice-table th, .invoice-table td {
+            padding: 10px;
+            border: 1px solid #dee2e6;
+            text-align: center;
+            font-size: 15px;
+        }
+
+        .invoice-table th {
+            background-color: #f1f1f1;
+            color: #045c0a;
+        }
+
+        .invoice-table td {
+            background-color: #ffffff;
+            color: #171717;
+        }
+
+        .invoice-summary {
+            margin-top: 20px;
+            padding: 10px 0;
+            border-top: 2px solid #dee2e6;
+            font-size: 18px;
+            text-align: right;
+        }
+
+        .invoice-summary span {
+            font-weight: bold;
+            color: #063b71;
+        }
+
+        .footer {
+            margin-top: 20px;
+            padding-top: 10px;
+            text-align: center;
+            color: #045c0a;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="invoice">
+        <div class="invoice-header">
+            <div class="logo">AgroRent Hub</div>
+            <div class="info">
+                <p><strong>Invoice Date:</strong> {{ order.ordered_at|date:"F j, Y h:i A" }}</p>
+
+                <p><strong>Order ID:</strong> {{ order.id }}</p>
+            </div>
+        </div>
+        <div class="invoice-item">
+            <h3>Order Details</h3>
+            <table class="invoice-table">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Quantity</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                        <th>Price</th>
+                        <th>Order Date</th>
+                        <th>Payment Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>{{ order.product.product_name }}</td>
+                        <td>{{ order.quantity }}</td>
+                        <td>{{ order.start_date }}</td>
+                        <td>{{ order.end_date }}</td>
+                        <td>{{ order.price }}</td>
+                        <td>{{ order.ordered_at }}</td>
+                        <td>{{ order.payment_status }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="invoice-summary">
+            <p><span>Total Price:</span> {{ order.price }}</p>
+        </div>
+        <div class="footer">
+            Thank you for choosing AgroRent Hub!<br>
+            &copy; 2024 AgroRent Hub. All rights reserved.
+        </div>
+    </div>
+</body>
+</html>

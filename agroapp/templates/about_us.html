@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - AgroRent Hub</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <style>
+        .content-section {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            flex-direction: row;
+            padding: 50px;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+
+        .main-heading {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 2.5rem;
+            color: #fff;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .information {
+            margin-left: 50px;
+            transition: transform 0.5s ease-in-out;
+            font-family: 'Great Vibes', cursive; /* Calligraphy-style font */
+            text-align: justify;
+        }
+
+        .information p {
+            transform: translateX(-50px);
+            opacity: 0;
+            animation: slideInFromLeft 1.5s ease-in-out forwards;
+        }
+
+        .information:hover {
+            transform: scale(1.05);
+        }
+
+        .information img {
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        @keyframes slideInFromLeft {
+            from { opacity: 0; transform: translateX(-50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .long-paragraph {
+            max-width: 600px;
+            margin-left: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="full-page">
+        <div class="navbar">
+            <div>
+                <a href="{% url 'index' %}">AgroRent Hub</a>
+            </div>
+            <nav>
+                <ul id="MenuItems">
+                    <li><a href="{% url 'index' %}">Home</a></li>
+                    <li><a href="{% url 'about_us' %}">About Us</a></li>
+                    <li><a href="{% url 'services' %}">Services</a></li>
+                    <li><a href="{% url 'rental_items' %}">Products</a></li>
+                    <li><a href="{% url 'contact' %}">Contact</a></li>
+                    <li><a href="{% url 'login' %}">Login</a></li>
+                    <li><a href="{% url 'register' %}">Register</a></li>
+                </ul>
+            </nav>
+        </div>
+        <div class="content-section">
+            <img src="{% static 'images/about.png' %}" alt="About Us Image">
+            <div class="information">
+                <h1 class="main-heading">Welcome to AgroRent Hub</h1>
+                <p>AgroRent Hub is dedicated to providing farmers with the tools and resources they need to succeed in the modern agricultural landscape. Our platform connects farmers with a wide range of rental options, including equipment, products, and services. Whether you're looking for a tractor for a short-term project, need specialized tools for a particular task, or require professional services to enhance your farming operations, AgroRent Hub has you covered.</p><br><br>
+                <p >At AgroRent Hub, we understand the challenges that farmers face and are committed to making their lives easier. Our user-friendly platform allows you to quickly find and rent the equipment and services you need, ensuring that you can focus on what matters most – growing and nurturing your crops. We work closely with a network of trusted suppliers to provide high-quality, reliable options that meet your needs. Our mission is to empower farmers by giving them access to the best resources available, helping them to improve productivity, efficiency, and sustainability. We believe in the power of technology to transform agriculture, and our goal is to make the latest advancements accessible to farmers everywhere. Thank you for choosing AgroRent Hub. Together, we can build a brighter future for agriculture.</p>
+            </div>
+        </div>
+    </div><br><br><br>
+    <div class="footer">
+        <div class="footer-content">
+        <p>&copy; 2024 AgroRent Hub. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>
