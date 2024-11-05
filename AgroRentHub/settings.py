@@ -16,6 +16,7 @@ SECRET_KEY = 'django-insecure-r=hvs657cc-!!xkiba!or2e^1-(c^vzz4#d*i&4^93uf0v^r6v
 DEBUG = True
 
 ALLOWED_HOSTS = ['romantic-felita-agroproject-61812c73.koyeb.app']
+ALLOWED_HOSTS = ['agrorenthub.onrender.com']
 
 
 # Application definition
