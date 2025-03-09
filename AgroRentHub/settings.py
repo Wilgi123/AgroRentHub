@@ -17,6 +17,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['romantic-felita-agroproject-61812c73.koyeb.app']
 ALLOWED_HOSTS = ['agrorenthub.onrender.com']
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
